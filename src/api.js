@@ -24,11 +24,11 @@ async function req(path, { method = 'GET', body, auth = true } = {}) {
   const r = await fetch(`${API}${path}`, {
     method, headers, body: body ? JSON.stringify(body) : undefined,
   })
-  if (r.status === 401) {
+  const d = await r.json().catch(() => ({}))
+  if (r.status === 401 && auth && tok) {
     setToken(null); _onAuthFail()
     throw new Error('session expired — please log in')
   }
-  const d = await r.json().catch(() => ({}))
   if (!r.ok) throw new Error(d.detail || d.error || `HTTP ${r.status}`)
   return d
 }
