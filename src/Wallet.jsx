@@ -37,13 +37,18 @@ export default function Wallet() {
   const [dep, setDep] = useState('')
   const timer = useRef(null)
 
+  // POST /wallet/tick advances the open trade AND returns status, so the chart
+  // fills live while the page is open. /wallet (read-only) is the fallback.
   async function refresh() {
-    try { setS(await apiGet('/wallet')); setErr('') }
-    catch (e) { setErr(e.message) }
+    try { setS(await apiPost('/wallet/tick')); setErr('') }
+    catch (e) {
+      try { setS(await apiGet('/wallet')); setErr('') }
+      catch (e2) { setErr(e2.message) }
+    }
   }
   useEffect(() => {
     refresh()
-    timer.current = setInterval(refresh, 5000)   // live poll every 5s
+    timer.current = setInterval(refresh, 5000)   // live poll + tick every 5s
     return () => clearInterval(timer.current)
   }, [])
 
