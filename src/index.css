@@ -85,5 +85,70 @@ code { background: #0d1320; padding: 1px 5px; border-radius: 5px; }
 
 .hist { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
 .hist th { color: var(--mut); text-align: left; font-weight: 500; padding: 6px 8px; border-bottom: 1px solid var(--line); }
-.hist td { padding: 6px 8px; border-bottom: 1px solid #1a2230; }
+.hist td { padding: 7px 8px; border-bottom: 1px solid #1a2230; vertical-align: top; }
 .hist td.ok { color: var(--good); } .hist td.err { color: var(--bad); }
+
+/* ── multi-user app shell ── */
+.app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+.sidebar { background: #0d1320; border-right: 1px solid var(--line); padding: 18px 0;
+  display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
+.brand { font-size: 17px; font-weight: 700; padding: 0 18px 14px; }
+.brand small { display: block; font-weight: 400; color: var(--mut); font-size: 11px; margin-top: 2px; }
+.snav { flex: 1; overflow: auto; }
+.snav-item { padding: 10px 18px; color: var(--mut); cursor: pointer; font-size: 14px;
+  border-left: 3px solid transparent; }
+.snav-item:hover { color: var(--txt); }
+.snav-item.active { color: var(--txt); border-left-color: var(--acc); background: #101725; }
+.snav-item.sub { padding-left: 34px; font-size: 13px; }
+.group-label { font-size: 11px; text-transform: uppercase; letter-spacing: .05em;
+  color: #5b6677; padding: 14px 18px 6px; }
+.userbox { border-top: 1px solid var(--line); padding: 12px 18px; font-size: 12.5px; color: var(--mut); }
+.userbox b { color: var(--txt); display: block; font-size: 13px; word-break: break-all; }
+.role { display: inline-block; font-size: 10.5px; background: #1c2738; color: var(--acc);
+  border-radius: 6px; padding: 1px 7px; margin-top: 4px; }
+.main { padding: 22px 26px 60px; overflow: auto; }
+.main h2 { font-size: 20px; margin: 0 0 3px; }
+.crumb { color: var(--mut); font-size: 13px; margin-bottom: 16px; }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+  padding: 16px 18px; margin-top: 16px; }
+.panel h3 { margin: 0 0 8px; font-size: 15px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.row input.sm { flex: 0 0 auto; width: 150px; padding: 9px 11px; }
+.row select { background: var(--bg); border: 1px solid var(--line); color: var(--txt);
+  border-radius: 9px; padding: 9px 11px; font-size: 14px; }
+button.ce { background: var(--good); } button.pe { background: var(--bad); }
+button.mini { min-width: 0; padding: 6px 11px; font-size: 12.5px; }
+button.mini.full { width: 100%; margin-top: 8px; background: transparent;
+  border: 1px solid var(--line); color: var(--mut); }
+button.mini.full:hover { color: var(--txt); border-color: var(--acc); }
+.tag { font-size: 11px; border-radius: 6px; padding: 2px 7px; background: #1c2738; color: var(--mut); }
+
+/* change-password form in sidebar */
+.pwform { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+.pwform input { flex: none; width: 100%; padding: 8px 10px; font-size: 12.5px; }
+.pwmsg { font-size: 11.5px; min-height: 14px; }
+
+/* history rows + AI analysis */
+.histrow { border: 1px solid var(--line); border-radius: 10px; padding: 11px 13px;
+  margin-top: 10px; background: #0f1623; }
+.hr-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.hr-detail { font-size: 12.5px; margin-top: 3px; }
+.aiwhy { margin-top: 8px; padding: 10px 12px; background: #0d1320; border: 1px solid var(--line);
+  border-left: 3px solid var(--acc); border-radius: 8px; font-size: 13px; line-height: 1.55; color: var(--txt); }
+
+/* auth gate */
+.authwrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.auth-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+  padding: 28px 26px; width: 100%; max-width: 380px; }
+.auth-card h1 { font-size: 22px; }
+.auth-card label { display: block; font-size: 12.5px; color: var(--mut); margin: 12px 0 5px; }
+.auth-card input { width: 100%; flex: none; background: var(--bg); }
+.auth-card button.primary { width: 100%; margin-top: 18px; min-height: 40px; padding: 9px 18px; font-size: 14px; line-height: 1.2; }
+.auth-err { color: var(--bad); font-size: 13px; margin-top: 12px; min-height: 18px; }
+.auth-toggle { margin-top: 14px; font-size: 13px; color: var(--mut); text-align: center; }
+.auth-toggle a { color: var(--acc); cursor: pointer; }
+
+@media (max-width: 640px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; }
+}
