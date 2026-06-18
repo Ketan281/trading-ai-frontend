@@ -1,7 +1,6 @@
 import { useState } from 'react'
-
-// API base — override at build time with VITE_API_URL (see .env.example)
-const API = import.meta.env.VITE_API_URL || 'https://ketan-trading.duckdns.org'
+import { API } from './api'
+import Wallet from './Wallet.jsx'
 
 const EXAMPLES = [
   'best banknifty intraday option today',
@@ -11,15 +10,10 @@ const EXAMPLES = [
 ]
 
 function Card({ k, v }) {
-  return (
-    <div className="c">
-      <div className="k">{k}</div>
-      <div className="v">{v}</div>
-    </div>
-  )
+  return <div className="c"><div className="k">{k}</div><div className="v">{v}</div></div>
 }
 
-export default function App() {
+function AskView() {
   const [q, setQ] = useState('best banknifty intraday option today')
   const [loading, setLoading] = useState(false)
   const [res, setRes] = useState(null)
@@ -37,11 +31,8 @@ export default function App() {
       })
       if (!r.ok) throw new Error(`HTTP ${r.status}`)
       setRes(await r.json())
-    } catch (e) {
-      setErr(e.message || 'request failed')
-    } finally {
-      setLoading(false)
-    }
+    } catch (e) { setErr(e.message || 'request failed') }
+    finally { setLoading(false) }
   }
 
   const cards = []
@@ -56,62 +47,45 @@ export default function App() {
   if (Array.isArray(d.actionable)) cards.push(['Actionable', d.actionable.length])
 
   return (
-    <div className="wrap">
-      <h1>📈 Trading-AI</h1>
-      <div className="sub">
-        NSE equities + NIFTY/BANKNIFTY options intelligence · paper-trading only · not financial advice
-      </div>
-
+    <>
       <div className="box">
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && ask()}
-          placeholder="e.g. best banknifty intraday option today"
-        />
-        <button onClick={() => ask()} disabled={loading}>
-          {loading ? '…' : 'Ask'}
-        </button>
+        <input value={q} onChange={(e) => setQ(e.target.value)}
+               onKeyDown={(e) => e.key === 'Enter' && ask()}
+               placeholder="e.g. best banknifty intraday option today" />
+        <button onClick={() => ask()} disabled={loading}>{loading ? '…' : 'Ask'}</button>
       </div>
-
       <div className="chips">
         {EXAMPLES.map((e) => (
-          <span key={e} className="chip" onClick={() => { setQ(e); ask(e) }}>
-            {e}
-          </span>
+          <span key={e} className="chip" onClick={() => { setQ(e); ask(e) }}>{e}</span>
         ))}
       </div>
-
       {loading && <div className="answer">Thinking… (first call can take a few seconds)</div>}
+      {err && <div className="answer err">Couldn't reach the API: {err}.</div>}
+      {res && !loading && <>
+        <div className="answer">{res.answer || '(no answer)'}</div>
+        <div className="meta">intent: {res.intent || '-'}{res.symbol ? ' · ' + res.symbol : ''}</div>
+        {cards.length > 0 && <div className="cards">{cards.map(([k, v]) => <Card key={k} k={k} v={String(v)} />)}</div>}
+        <details><summary>Show full data (JSON)</summary><pre>{JSON.stringify(res.data, null, 2)}</pre></details>
+      </>}
+    </>
+  )
+}
 
-      {err && (
-        <div className="answer err">
-          Couldn't reach the API: {err}.<br />
-          Check the API is up and <code>ALLOWED_ORIGINS</code> includes this site.
-        </div>
-      )}
+export default function App() {
+  const [tab, setTab] = useState('ask')
+  return (
+    <div className="wrap">
+      <h1>📈 Trading-AI</h1>
+      <div className="sub">NSE equities + NIFTY/BANKNIFTY options intelligence · paper-trading only · not financial advice</div>
 
-      {res && !loading && (
-        <>
-          <div className="answer">{res.answer || '(no answer)'}</div>
-          <div className="meta">
-            intent: {res.intent || '-'}{res.symbol ? ' · ' + res.symbol : ''}
-          </div>
-          {cards.length > 0 && (
-            <div className="cards">
-              {cards.map(([k, v]) => <Card key={k} k={k} v={String(v)} />)}
-            </div>
-          )}
-          <details>
-            <summary>Show full data (JSON)</summary>
-            <pre>{JSON.stringify(res.data, null, 2)}</pre>
-          </details>
-        </>
-      )}
-
-      <div className="foot">
-        Quantitative engines produce every number · the AI only summarizes · paper mode
+      <div className="nav">
+        <button className={'tab' + (tab === 'ask' ? ' on' : '')} onClick={() => setTab('ask')}>Ask</button>
+        <button className={'tab' + (tab === 'wallet' ? ' on' : '')} onClick={() => setTab('wallet')}>💰 Auto-Wallet</button>
       </div>
+
+      {tab === 'ask' ? <AskView /> : <Wallet />}
+
+      <div className="foot">Quantitative engines produce every number · the AI only summarizes · paper mode</div>
     </div>
   )
 }

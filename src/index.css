@@ -53,3 +53,37 @@ pre {
 }
 code { background: #0d1320; padding: 1px 5px; border-radius: 5px; }
 .foot { color: var(--mut); font-size: 11.5px; margin-top: 26px; text-align: center; }
+
+/* tabs */
+.nav { display: flex; gap: 8px; margin-bottom: 16px; }
+.tab {
+  background: var(--card); color: var(--mut); border: 1px solid var(--line);
+  border-radius: 10px; padding: 9px 16px; font-size: 14px; font-weight: 600;
+  cursor: pointer; min-width: 0;
+}
+.tab.on { background: var(--acc); color: #fff; border-color: var(--acc); }
+
+/* wallet */
+.disc {
+  background: rgba(245, 158, 11, .08); border: 1px solid rgba(245, 158, 11, .3);
+  color: #f7c477; border-radius: 10px; padding: 11px 14px; font-size: 12.5px; margin-bottom: 16px;
+}
+.v.ok { color: var(--good); } .v.err { color: var(--bad); }
+.mut { color: var(--mut); font-size: 12px; font-weight: 400; }
+.badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; margin-left: 8px; }
+.badge.open { background: rgba(59,130,246,.2); color: #7fb0ff; }
+.badge.win  { background: rgba(34,197,94,.18); color: var(--good); }
+.badge.loss { background: rgba(239,68,68,.18); color: var(--bad); }
+
+.chart {
+  width: 100%; height: auto; background: var(--card); border: 1px solid var(--line);
+  border-radius: 12px; margin-top: 14px; display: block;
+}
+.chart.empty {
+  color: var(--mut); font-size: 13px; padding: 28px 16px; text-align: center;
+}
+
+.hist { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
+.hist th { color: var(--mut); text-align: left; font-weight: 500; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+.hist td { padding: 6px 8px; border-bottom: 1px solid #1a2230; }
+.hist td.ok { color: var(--good); } .hist td.err { color: var(--bad); }
