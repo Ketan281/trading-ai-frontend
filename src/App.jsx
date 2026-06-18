@@ -84,16 +84,52 @@ function Positions({ trades, refresh }) {
   )
 }
 
+// ── mode toggle ──
+function ModeToggle({ mode, onToggle }) {
+  const isML = mode === 'ml'
+  return <div className="mode-toggle">
+    <div className="mode-label">Trading Mode</div>
+    <div className="mode-switch">
+      <button className={'mode-btn' + (!isML ? ' active' : '')} onClick={() => onToggle('custom')}>
+        Custom <span className="mode-desc">You trade manually</span>
+      </button>
+      <button className={'mode-btn ml' + (isML ? ' active' : '')} onClick={() => onToggle('ml')}>
+        ML Auto <span className="mode-desc">System picks & manages</span>
+      </button>
+    </div>
+    {isML && <div className="mode-info">
+      The system automatically picks the best trade each day, enters it, monitors stop-loss & target, and closes it. You can still view everything and manually square off if needed.
+    </div>}
+  </div>
+}
+
 // ── views ──
 function Dashboard() {
   const { data, refresh } = useWallet()
   const [reco, setReco] = useState(null)
+  const [mode, setMode] = useState(null)
+  const [toggling, setToggling] = useState(false)
   useEffect(() => { apiGet('/recommendation').then(setReco).catch((e) => setReco({ answer: e.message })) }, [])
+  useEffect(() => { if (data?.trade_mode) setMode(data.trade_mode) }, [data])
+  async function toggleMode(m) {
+    setToggling(true)
+    try {
+      await apiPost('/me/mode', { mode: m })
+      setMode(m); refresh()
+    } catch (e) { alert(e.message) } finally { setToggling(false) }
+  }
   return <>
     <h2>Dashboard</h2><div className="crumb">Your paper wallet & today's idea</div>
+    {mode !== null && <ModeToggle mode={mode} onToggle={toggleMode} />}
+    {toggling && <div className="mut">Switching mode…</div>}
     <WalletPanel wallet={data} refresh={refresh} />
-    <div className="panel"><h3>⭐ Today's best idea</h3>
-      {reco ? <div className="answer">{reco.answer}</div> : <div className="mut">Loading…</div>}</div>
+    {mode === 'ml'
+      ? <div className="panel ml-panel"><h3>🤖 ML Mode Active</h3>
+          <div className="answer">The system is managing your trades automatically. It will pick the best trade during market hours, enter with proper risk management (SL + target), and close at exit or 3:15 PM.</div>
+        </div>
+      : <div className="panel"><h3>⭐ Today's best idea</h3>
+          {reco ? <div className="answer">{reco.answer}</div> : <div className="mut">Loading…</div>}
+        </div>}
     <div className="panel"><h3>Open positions</h3><Positions trades={data?.open_trades} refresh={refresh} /></div>
     <div className="foot">Quantitative engines produce every number · the AI only summarizes · paper money only, no profit guarantee</div>
   </>
