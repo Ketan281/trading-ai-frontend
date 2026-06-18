@@ -1,0 +1,582 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "App.jsx",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_app",
+      "community": 0,
+      "norm_label": "app.jsx"
+    },
+    {
+      "label": "fmt()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "src_app_fmt",
+      "community": 2,
+      "norm_label": "fmt()"
+    },
+    {
+      "label": "useWallet()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "src_app_usewallet",
+      "community": 1,
+      "norm_label": "usewallet()"
+    },
+    {
+      "label": "useCandles()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L22",
+      "_origin": "ast",
+      "id": "src_app_usecandles",
+      "community": 1,
+      "norm_label": "usecandles()"
+    },
+    {
+      "label": "Card()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L41",
+      "_origin": "ast",
+      "id": "src_app_card",
+      "community": 0,
+      "norm_label": "card()"
+    },
+    {
+      "label": "WalletPanel()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L44",
+      "_origin": "ast",
+      "id": "src_app_walletpanel",
+      "community": 2,
+      "norm_label": "walletpanel()"
+    },
+    {
+      "label": "Positions()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L67",
+      "_origin": "ast",
+      "id": "src_app_positions",
+      "community": 0,
+      "norm_label": "positions()"
+    },
+    {
+      "label": "ModeToggle()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L88",
+      "_origin": "ast",
+      "id": "src_app_modetoggle",
+      "community": 0,
+      "norm_label": "modetoggle()"
+    },
+    {
+      "label": "Dashboard()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L107",
+      "_origin": "ast",
+      "id": "src_app_dashboard",
+      "community": 1,
+      "norm_label": "dashboard()"
+    },
+    {
+      "label": "TradeButtons()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L138",
+      "_origin": "ast",
+      "id": "src_app_tradebuttons",
+      "community": 0,
+      "norm_label": "tradebuttons()"
+    },
+    {
+      "label": "OptionsView()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L140",
+      "_origin": "ast",
+      "id": "src_app_optionsview",
+      "community": 1,
+      "norm_label": "optionsview()"
+    },
+    {
+      "label": "FuturesView()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L168",
+      "_origin": "ast",
+      "id": "src_app_futuresview",
+      "community": 1,
+      "norm_label": "futuresview()"
+    },
+    {
+      "label": "EquityView()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L198",
+      "_origin": "ast",
+      "id": "src_app_equityview",
+      "community": 1,
+      "norm_label": "equityview()"
+    },
+    {
+      "label": "RecoView()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L231",
+      "_origin": "ast",
+      "id": "src_app_recoview",
+      "community": 1,
+      "norm_label": "recoview()"
+    },
+    {
+      "label": "HistRow()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L261",
+      "_origin": "ast",
+      "id": "src_app_histrow",
+      "community": 2,
+      "norm_label": "histrow()"
+    },
+    {
+      "label": "HistoryView()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L285",
+      "_origin": "ast",
+      "id": "src_app_historyview",
+      "community": 0,
+      "norm_label": "historyview()"
+    },
+    {
+      "label": "AdminView()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L310",
+      "_origin": "ast",
+      "id": "src_app_adminview",
+      "community": 0,
+      "norm_label": "adminview()"
+    },
+    {
+      "label": "AskView()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L348",
+      "_origin": "ast",
+      "id": "src_app_askview",
+      "community": 0,
+      "norm_label": "askview()"
+    },
+    {
+      "label": "NAV",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L377",
+      "_origin": "ast",
+      "id": "src_app_nav",
+      "community": 0,
+      "norm_label": "nav"
+    },
+    {
+      "label": "ChangePassword()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L389",
+      "_origin": "ast",
+      "id": "src_app_changepassword",
+      "community": 0,
+      "norm_label": "changepassword()"
+    },
+    {
+      "label": "Sidebar()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L406",
+      "_origin": "ast",
+      "id": "src_app_sidebar",
+      "community": 0,
+      "norm_label": "sidebar()"
+    },
+    {
+      "label": "AuthGate()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L429",
+      "_origin": "ast",
+      "id": "src_app_authgate",
+      "community": 0,
+      "norm_label": "authgate()"
+    },
+    {
+      "label": "App()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L460",
+      "_origin": "ast",
+      "id": "src_app_app",
+      "community": 0,
+      "norm_label": "app()"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L310",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_adminview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L460",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_app",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L348",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_askview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L429",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_authgate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L41",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_card",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L389",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_changepassword",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L107",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_dashboard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L198",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_equityview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_fmt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L168",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_futuresview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L285",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_historyview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L261",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_histrow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L88",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_modetoggle",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L377",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_nav",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L140",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_optionsview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L67",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_positions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L231",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_recoview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L406",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_sidebar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L138",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_tradebuttons",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_usecandles",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_usewallet",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_walletpanel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L275",
+      "weight": 1.0,
+      "source": "src_app_histrow",
+      "target": "src_app_fmt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L50",
+      "weight": 1.0,
+      "source": "src_app_walletpanel",
+      "target": "src_app_fmt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L108",
+      "weight": 1.0,
+      "source": "src_app_dashboard",
+      "target": "src_app_usewallet",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L199",
+      "weight": 1.0,
+      "source": "src_app_equityview",
+      "target": "src_app_usewallet",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L169",
+      "weight": 1.0,
+      "source": "src_app_futuresview",
+      "target": "src_app_usewallet",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L141",
+      "weight": 1.0,
+      "source": "src_app_optionsview",
+      "target": "src_app_usewallet",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L232",
+      "weight": 1.0,
+      "source": "src_app_recoview",
+      "target": "src_app_usewallet",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L202",
+      "weight": 1.0,
+      "source": "src_app_equityview",
+      "target": "src_app_usecandles",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L171",
+      "weight": 1.0,
+      "source": "src_app_futuresview",
+      "target": "src_app_usecandles",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L142",
+      "weight": 1.0,
+      "source": "src_app_optionsview",
+      "target": "src_app_usecandles",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L237",
+      "weight": 1.0,
+      "source": "src_app_recoview",
+      "target": "src_app_usecandles",
+      "confidence_score": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "built_at_commit": "a5809ae6db0d934fe5c55331b0047a8545bbddbc"
+}

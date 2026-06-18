@@ -228,6 +228,87 @@ function EquityView() {
   </>
 }
 
+function ForexView() {
+  const { data, refresh } = useWallet()
+  const [pairs, setPairs] = useState([])
+  const [pair, setPair] = useState('EUR/USD')
+  const [candles, setCandles] = useState(null)
+  const [signals, setSignals] = useState(null)
+  const [levels, setLevels] = useState(null)
+  const [msg, setMsg] = useState('')
+  const [loadingSig, setLoadingSig] = useState(false)
+  useEffect(() => { apiGet('/forex/pairs').then(d => setPairs(d.pairs || [])).catch(() => {}) }, [])
+  useEffect(() => {
+    if (!pair) return
+    let live = true
+    apiGet(`/forex/candles/${pair}?interval=15m&period=5d`)
+      .then(d => { if (live) setCandles(d.candles || []) }).catch(() => {})
+    return () => { live = false }
+  }, [pair])
+  async function loadSignals() {
+    setLoadingSig(true)
+    try {
+      const d = await apiGet(`/forex/signals/${pair}`)
+      setSignals(d)
+    } catch (e) { setSignals({ error: e.message }) } finally { setLoadingSig(false) }
+  }
+  useEffect(() => { loadSignals() }, [pair])
+  async function take(side) {
+    setMsg('Placing…')
+    try {
+      const r = await apiPost('/me/trade', { segment: 'forex', pair, side })
+      if (r.error) { setMsg(r.error); return }
+      const t = r.trade
+      setLevels({ entry: t.entry, stop: t.stop, target: t.target })
+      setMsg(`Opened ${t.symbol} ${side} @ ${t.entry} ×${t.qty.toLocaleString()}`); refresh()
+    } catch (e) { setMsg(e.message) }
+  }
+  const dir = signals?.direction
+  return <>
+    <h2>Forex Trading</h2>
+    <div className="crumb">Multi-timeframe confluence analysis · 19 indicators · paper trading</div>
+    <div className="row">
+      <select value={pair} onChange={(e) => { setPair(e.target.value); setLevels(null); setSignals(null) }}>
+        {(pairs.length ? pairs : ['EUR/USD']).map(p => <option key={p} value={p}>{p}</option>)}
+      </select>
+      <button className="ce" onClick={() => take('buy')}>Buy (Long)</button>
+      <button className="pe" onClick={() => take('sell')}>Sell (Short)</button>
+    </div>
+    <TradeButtons msg={msg} />
+    {signals && !signals.error && <div className="panel">
+      <h3>Confluence Signal — {pair}</h3>
+      <div className="cards">
+        <Card k="Direction" v={dir === 'none' ? 'No trade' : dir?.toUpperCase()} cls={dir === 'buy' ? 'ok' : dir === 'sell' ? 'err' : ''} />
+        <Card k="Score" v={signals.score?.toFixed(3)} cls={signals.score > 0 ? 'ok' : signals.score < 0 ? 'err' : ''} />
+        <Card k="Confidence" v={signals.confidence} />
+        <Card k="TFs Agree" v={`${signals.agreeing_timeframes}/${signals.total_timeframes}`} />
+      </div>
+      {signals.tf_signals && <div style={{ marginTop: 12 }}>
+        {Object.entries(signals.tf_signals).map(([tf, s]) =>
+          <div key={tf} className="histrow">
+            <div className="hr-top">
+              <b>{tf.toUpperCase()}</b>
+              <span className={'tag ' + (s.bias === 'bullish' ? 'ok' : s.bias === 'bearish' ? 'err' : '')}>{s.bias}</span>
+            </div>
+            <div className="hr-detail mut">
+              Bullish: {s.bullish} · Bearish: {s.bearish} · Neutral: {s.neutral} (of {s.total})
+            </div>
+          </div>
+        )}
+      </div>}
+      {signals.trade_plan && <div className="aiwhy" style={{ marginTop: 10 }}>
+        Trade plan: {signals.trade_plan.direction?.toUpperCase()} @ {signals.trade_plan.entry},
+        SL {signals.trade_plan.stop_loss} ({signals.trade_plan.sl_pips} pips),
+        TP {signals.trade_plan.take_profit} ({signals.trade_plan.tp_pips} pips),
+        R:R {signals.trade_plan.risk_reward}:1
+      </div>}
+    </div>}
+    {loadingSig && <div className="mut" style={{ marginTop: 8 }}>Analysing {pair} across all timeframes…</div>}
+    <CandleChart candles={candles} levels={levels} title={`${pair} · 15m`} />
+    <div className="panel"><h3>Open positions</h3><Positions trades={data?.open_trades} refresh={refresh} /></div>
+  </>
+}
+
 function RecoView() {
   const { data, refresh } = useWallet()
   const [reco, setReco] = useState(null)
@@ -381,6 +462,8 @@ const NAV = [
   { id: 'opt-BANKNIFTY', label: '🔵 Options · BANKNIFTY', sub: true },
   { id: 'futures', label: '📈 Futures' },
   { id: 'equity', label: '🏦 Intraday Equity' },
+  { group: 'Forex' },
+  { id: 'forex', label: '💱 Forex Trading' },
   { id: 'reco', label: '⭐ Best Recommendation' },
   { id: 'ask', label: '💬 Ask AI' },
   { id: 'history', label: '📜 History' },
@@ -482,6 +565,7 @@ export default function App() {
       {view === 'opt-BANKNIFTY' && <OptionsView sym="BANKNIFTY" key="optb" />}
       {view === 'futures' && <FuturesView />}
       {view === 'equity' && <EquityView />}
+      {view === 'forex' && <ForexView />}
       {view === 'reco' && <RecoView />}
       {view === 'ask' && <AskView />}
       {view === 'history' && <HistoryView />}
