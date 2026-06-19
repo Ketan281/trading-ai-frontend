@@ -3,6 +3,8 @@ import { apiGet, apiPost, getToken, setToken, setAuthFailHandler } from './api'
 import CandleChart from './CandleChart.jsx'
 
 const fmt = (n) => n == null ? '–' : '₹' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 })
+const fmtFx = (n) => n == null ? '–' : Number(n).toFixed(5)
+const fmtPnl = (n, fx) => n == null ? '–' : (fx ? '$' : '₹') + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 })
 
 // ── shared hooks ──
 function useWallet(poll = true) {
@@ -72,11 +74,13 @@ function Positions({ trades, refresh }) {
       <tbody>{trades.map((t) => {
         const last = t.pnl_series?.length ? t.pnl_series[t.pnl_series.length - 1] : null
         const ltp = last ? last[1] : t.entry, pnl = last ? last[2] : 0
+        const fx = t.segment === 'forex'
+        const p = fx ? fmtFx : fmt
         return <tr key={t.id}>
           <td>{t.symbol}<div className="mut">{t.segment} · {t.side}</div></td>
-          <td>{t.qty}</td><td>{fmt(t.entry)}</td><td>{fmt(ltp)}</td>
-          <td>{fmt(t.stop)} / {fmt(t.target)}</td>
-          <td className={pnl >= 0 ? 'ok' : 'err'}>{fmt(pnl)}</td>
+          <td>{t.qty}</td><td>{p(t.entry)}</td><td>{p(ltp)}</td>
+          <td>{p(t.stop)} / {p(t.target)}</td>
+          <td className={pnl >= 0 ? 'ok' : 'err'}>{fmtPnl(pnl, fx)}</td>
           <td><button className="mini" onClick={async () => { await apiPost(`/me/trade/${t.id}/close`); refresh() }}>Square off</button></td>
         </tr>
       })}</tbody>
