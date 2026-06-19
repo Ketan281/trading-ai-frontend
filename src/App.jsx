@@ -42,18 +42,30 @@ function useCandles(symbol) {
 
 function useLiveStream() {
   const [snapshot, setSnapshot] = useState(null)
-  const esRef = useRef(null)
+  const wsRef = useRef(null)
+  const reconnectRef = useRef(null)
   useEffect(() => {
-    const tok = getToken()
-    if (!tok) return
-    const url = `${API}/me/live?token=${encodeURIComponent(tok)}`
-    const es = new EventSource(url)
-    esRef.current = es
-    es.onmessage = (e) => {
-      try { setSnapshot(JSON.parse(e.data)) } catch {}
+    function connect() {
+      const tok = getToken()
+      if (!tok) return
+      const proto = API.startsWith('https') ? 'wss' : 'ws'
+      const host = API.replace(/^https?:\/\//, '')
+      const url = `${proto}://${host}/ws/live?token=${encodeURIComponent(tok)}`
+      const ws = new WebSocket(url)
+      wsRef.current = ws
+      ws.onmessage = (e) => {
+        try { setSnapshot(JSON.parse(e.data)) } catch {}
+      }
+      ws.onclose = () => {
+        reconnectRef.current = setTimeout(connect, 3000)
+      }
+      ws.onerror = () => { ws.close() }
     }
-    es.onerror = () => { es.close() }
-    return () => es.close()
+    connect()
+    return () => {
+      clearTimeout(reconnectRef.current)
+      wsRef.current?.close()
+    }
   }, [])
   return snapshot
 }
@@ -311,8 +323,8 @@ function OptionsView({ sym }) {
   return <>
     <h2>Options · {sym}</h2><div className="crumb">ATM weekly option — buy CE or PE</div>
     <div className="row">
-      <button className="ce" onClick={() => take('CE')}>Buy {sym} CE (ATM)</button>
-      <button className="pe" onClick={() => take('PE')}>Buy {sym} PE (ATM)</button>
+      <button className="trade-btn buy" onClick={() => take('CE')}>Buy {sym} CE (ATM)</button>
+      <button className="trade-btn sell" onClick={() => take('PE')}>Buy {sym} PE (ATM)</button>
     </div>
     <TradeButtons msg={msg} />
     <CandleChart candles={candles} levels={levels} title={`${sym} · 5m`} />
@@ -342,8 +354,8 @@ function FuturesView() {
     <div className="row">
       <select value={sym} onChange={(e) => { setSym(e.target.value); setLevels(null) }}>
         <option>NIFTY</option><option>BANKNIFTY</option></select>
-      <button className="ce" onClick={() => take('long')}>Go Long</button>
-      <button className="pe" onClick={() => take('short')}>Go Short</button>
+      <button className="trade-btn buy" onClick={() => take('long')}>Go Long</button>
+      <button className="trade-btn sell" onClick={() => take('short')}>Go Short</button>
     </div>
     <TradeButtons msg={msg} />
     <CandleChart candles={candles} levels={levels} title={`${sym} · 5m`} />
@@ -358,6 +370,11 @@ function EquityView() {
   const candles = useCandles(sym.toUpperCase().trim())
   const [levels, setLevels] = useState(null)
   const [msg, setMsg] = useState('')
+  const [eqReco, setEqReco] = useState(null)
+  const [recoLoading, setRecoLoading] = useState(true)
+  useEffect(() => {
+    apiGet('/equity/recommendation').then(setEqReco).catch(() => {}).finally(() => setRecoLoading(false))
+  }, [])
   async function take(side) {
     const spec = { segment: 'equity', symbol: sym.toUpperCase().trim(), side }
     if (qty) spec.qty = Number(qty)
@@ -370,14 +387,46 @@ function EquityView() {
       setMsg(`Opened ${t.symbol} @ ${fmt(t.entry)} x${t.qty}`); refresh()
     } catch (e) { setMsg(e.message) }
   }
+  async function takeReco() {
+    const spec = eqReco?.recommendation?.spec
+    if (!spec) return
+    setMsg('Placing recommended trade...')
+    try {
+      const r = await apiPost('/me/trade', spec)
+      if (r.error) { setMsg(r.error); return }
+      const t = r.trade
+      setLevels({ entry: t.entry, stop: t.stop, target: t.target })
+      setMsg(`Opened ${t.symbol} @ ${fmt(t.entry)} x${t.qty}`); refresh()
+    } catch (e) { setMsg(e.message) }
+  }
   const indianTrades = (data?.open_trades || []).filter(t => t.segment !== 'forex')
+  const reco = eqReco?.recommendation
+  const picks = eqReco?.screener_picks || []
   return <>
     <h2>Intraday Equity</h2><div className="crumb">Cash-segment intraday on a liquid stock</div>
+
+    {recoLoading && <div className="panel"><div className="mut">Scanning for best equity trade...</div></div>}
+    {reco && <div className="panel reco-panel">
+      <h3>Best Equity Recommendation</h3>
+      <div className="answer">{reco.answer}</div>
+      {reco.spec && <button className="take-trade-btn" onClick={takeReco}>Execute This Trade</button>}
+    </div>}
+    {picks.length > 0 && <div className="panel">
+      <h3>Top Screener Picks</h3>
+      <div className="picks-grid">
+        {picks.map((p, i) => <div key={i} className="pick-card" onClick={() => setSym(p.symbol || p.ticker || '')}>
+          <b>{p.symbol || p.ticker}</b>
+          {p.score != null && <span className="pick-score">{p.score.toFixed?.(1) ?? p.score}</span>}
+          {p.reason && <div className="mut">{p.reason}</div>}
+        </div>)}
+      </div>
+    </div>}
+
     <div className="row">
       <input className="sm" value={sym} onChange={(e) => setSym(e.target.value)} placeholder="SYMBOL" />
       <input className="sm" type="number" value={qty} onChange={(e) => setQty(e.target.value)} placeholder="qty (auto)" />
-      <button className="ce" onClick={() => take('long')}>Buy</button>
-      <button className="pe" onClick={() => take('short')}>Short</button>
+      <button className="trade-btn buy" onClick={() => take('long')}>Buy Long</button>
+      <button className="trade-btn sell" onClick={() => take('short')}>Sell Short</button>
     </div>
     <TradeButtons msg={msg} />
     <CandleChart candles={candles} levels={levels} title={`${sym.toUpperCase()} · 5m`} />
@@ -394,7 +443,12 @@ function ForexView() {
   const [levels, setLevels] = useState(null)
   const [msg, setMsg] = useState('')
   const [loadingSig, setLoadingSig] = useState(false)
+  const [fxReco, setFxReco] = useState(null)
+  const [recoLoading, setRecoLoading] = useState(true)
   useEffect(() => { apiGet('/forex/pairs').then(d => setPairs(d.pairs || [])).catch(() => {}) }, [])
+  useEffect(() => {
+    apiGet('/forex/recommendation').then(setFxReco).catch(() => {}).finally(() => setRecoLoading(false))
+  }, [])
   useEffect(() => {
     if (!pair) return
     let live = true
@@ -420,6 +474,12 @@ function ForexView() {
       setMsg(`Opened ${t.symbol} ${side} @ ${t.entry} x${t.qty.toLocaleString()}`); refresh()
     } catch (e) { setMsg(e.message) }
   }
+  async function takeReco() {
+    const t = fxReco?.trade
+    if (!t) return
+    take(t.direction)
+    setPair(t.pair)
+  }
   const fxWallet = data?.forex_wallet
   const forexTrades = (data?.open_trades || []).filter(t => t.segment === 'forex')
   const dir = signals?.direction
@@ -430,12 +490,20 @@ function ForexView() {
       <Card k="Forex Balance" v={fmtUsd(fxWallet.balance)} />
       <Card k="Forex Realized" v={fmtUsd(fxWallet.realized_pnl)} />
     </div>}
+
+    {recoLoading && <div className="panel"><div className="mut">Scanning all pairs for best setup...</div></div>}
+    {fxReco && <div className="panel reco-panel">
+      <h3>Best Forex Recommendation</h3>
+      <div className="answer">{fxReco.answer}</div>
+      {fxReco.trade && <button className="take-trade-btn" onClick={takeReco}>Execute This Trade</button>}
+    </div>}
+
     <div className="row">
-      <select value={pair} onChange={(e) => { setPair(e.target.value); setLevels(null); setSignals(null) }}>
+      <select className="pair-select" value={pair} onChange={(e) => { setPair(e.target.value); setLevels(null); setSignals(null) }}>
         {(pairs.length ? pairs : ['EUR/USD']).map(p => <option key={p} value={p}>{p}</option>)}
       </select>
-      <button className="ce" onClick={() => take('buy')}>Buy (Long)</button>
-      <button className="pe" onClick={() => take('sell')}>Sell (Short)</button>
+      <button className="trade-btn buy" onClick={() => take('buy')}>Buy Long</button>
+      <button className="trade-btn sell" onClick={() => take('sell')}>Sell Short</button>
     </div>
     <TradeButtons msg={msg} />
     {signals && !signals.error && <div className="panel">
@@ -464,6 +532,9 @@ function ForexView() {
         SL {signals.trade_plan.stop_loss} ({signals.trade_plan.sl_pips} pips),
         TP {signals.trade_plan.take_profit} ({signals.trade_plan.tp_pips} pips),
         R:R {signals.trade_plan.risk_reward}:1
+        <button className="take-trade-btn inline" onClick={() => take(signals.trade_plan.direction)}>
+          Take This Signal
+        </button>
       </div>}
     </div>}
     {loadingSig && <div className="mut" style={{ marginTop: 8 }}>Analysing {pair} across all timeframes...</div>}
@@ -494,7 +565,7 @@ function RecoView() {
     <h2>Best Recommendation</h2><div className="crumb">Today's single highest-conviction idea</div>
     {!reco ? <div className="mut">Computing today's best trade...</div> : <>
       <div className="answer">{reco.answer}</div>
-      {reco.spec && <div className="row" style={{ marginTop: 10 }}><button onClick={take}>Take this trade</button></div>}
+      {reco.spec && <button className="take-trade-btn" onClick={take}>Execute This Trade</button>}
       <TradeButtons msg={msg} />
       <CandleChart candles={candles} levels={levels} title={reco.chart_symbol ? `${reco.chart_symbol} · 5m` : ''} />
     </>}
@@ -710,22 +781,27 @@ function AuthGate({ onAuth }) {
     } catch (e) { setErr(e.message); setBusy(false) }
   }
 
+  const [googleReady, setGoogleReady] = useState(false)
   useEffect(() => {
     const script = document.createElement('script')
     script.src = 'https://accounts.google.com/gsi/client'
     script.async = true
-    script.onload = () => {
-      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
-      if (!clientId || !window.google?.accounts?.id) return
-      window.google.accounts.id.initialize({
-        client_id: clientId,
-        callback: async (response) => {
-          try {
-            const d = await apiPost('/auth/google', { id_token: response.credential }, { auth: false })
-            setToken(d.token); onAuth(d.user)
-          } catch (e) { setErr(e.message) }
-        }
-      })
+    script.onload = async () => {
+      try {
+        const cfg = await (await fetch(`${API}/auth/config`)).json()
+        const clientId = cfg.google_client_id || import.meta.env.VITE_GOOGLE_CLIENT_ID
+        if (!clientId || !window.google?.accounts?.id) return
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: async (response) => {
+            try {
+              const d = await apiPost('/auth/google', { id_token: response.credential }, { auth: false })
+              setToken(d.token); onAuth(d.user)
+            } catch (e) { setErr(e.message) }
+          }
+        })
+        setGoogleReady(true)
+      } catch {}
     }
     document.head.appendChild(script)
     return () => { try { document.head.removeChild(script) } catch {} }
@@ -736,7 +812,7 @@ function AuthGate({ onAuth }) {
       <h1>Trading-AI</h1>
       <div className="sub">{signup ? 'Create your paper-trading account' : 'Sign in to your paper-trading account'}</div>
 
-      {import.meta.env.VITE_GOOGLE_CLIENT_ID && <>
+      {googleReady && <>
         <button type="button" className="google-btn" onClick={googleLogin} disabled={busy}>
           <svg viewBox="0 0 24 24" width="18" height="18" style={{marginRight: 8}}>
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>

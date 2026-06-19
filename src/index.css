@@ -3,6 +3,10 @@
   --mut: #8b97a8; --acc: #3b82f6; --good: #22c55e; --bad: #ef4444;
 }
 * { box-sizing: border-box; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2a3446; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #3b4d66; }
 body {
   margin: 0; background: var(--bg); color: var(--txt);
   font: 15px/1.5 system-ui, "Segoe UI", Roboto, sans-serif;
@@ -86,6 +90,7 @@ code { background: #0d1320; padding: 1px 5px; border-radius: 5px; }
 .hist { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
 .hist th { color: var(--mut); text-align: left; font-weight: 500; padding: 6px 8px; border-bottom: 1px solid var(--line); }
 .hist td { padding: 7px 8px; border-bottom: 1px solid #1a2230; vertical-align: top; }
+.hist select { padding: 6px 26px 6px 8px; font-size: 12.5px; border-radius: 8px; }
 .hist td.ok { color: var(--good); } .hist td.err { color: var(--bad); }
 
 /* ── multi-user app shell ── */
@@ -114,9 +119,43 @@ code { background: #0d1320; padding: 1px 5px; border-radius: 5px; }
 .panel h3 { margin: 0 0 8px; font-size: 15px; }
 .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 .row input.sm { flex: 0 0 auto; width: 150px; padding: 9px 11px; }
-.row select { background: var(--bg); border: 1px solid var(--line); color: var(--txt);
-  border-radius: 9px; padding: 9px 11px; font-size: 14px; }
+select, .row select { background: var(--bg); border: 1px solid var(--line); color: var(--txt);
+  border-radius: 9px; padding: 9px 11px; font-size: 14px; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b97a8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; cursor: pointer; }
+select:focus, .row select:focus { border-color: var(--acc); outline: none; }
+.pair-select { min-width: 120px; }
 button.ce { background: var(--good); } button.pe { background: var(--bad); }
+
+/* polished trade buttons */
+.trade-btn { padding: 10px 20px; font-size: 14px; font-weight: 600; border-radius: 10px;
+  border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+  transition: transform .1s, box-shadow .15s; min-width: 100px; justify-content: center; }
+.trade-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.3); }
+.trade-btn:active { transform: translateY(0); }
+.trade-btn.buy { background: linear-gradient(135deg, #16a34a, #22c55e); color: #fff; }
+.trade-btn.sell { background: linear-gradient(135deg, #dc2626, #ef4444); color: #fff; }
+
+/* take-trade / execute button */
+.take-trade-btn { display: block; margin-top: 14px; width: 100%; padding: 12px 20px;
+  font-size: 15px; font-weight: 700; border: 0; border-radius: 10px; cursor: pointer;
+  background: linear-gradient(135deg, #7c3aed, #a78bfa); color: #fff;
+  transition: transform .1s, box-shadow .15s; }
+.take-trade-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(124,58,237,.4); }
+.take-trade-btn.inline { display: inline-block; width: auto; margin-top: 10px; margin-left: 12px;
+  padding: 8px 16px; font-size: 13px; }
+
+/* recommendation panel */
+.reco-panel { border-left: 3px solid #7c3aed; }
+.reco-panel h3 { color: #a78bfa; }
+
+/* screener picks grid */
+.picks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-top: 10px; }
+.pick-card { background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
+  padding: 10px 12px; cursor: pointer; transition: border-color .15s; }
+.pick-card:hover { border-color: var(--acc); }
+.pick-card .pick-score { float: right; color: var(--good); font-weight: 600; font-size: 13px; }
+
 button.mini { min-width: 0; padding: 6px 11px; font-size: 12.5px; }
 button.mini.full { width: 100%; margin-top: 8px; background: transparent;
   border: 1px solid var(--line); color: var(--mut); }
