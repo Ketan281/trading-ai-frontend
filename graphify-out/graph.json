@@ -24,10 +24,30 @@
       "norm_label": "fmt()"
     },
     {
+      "label": "fmtFx()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "src_app_fmtfx",
+      "community": 0,
+      "norm_label": "fmtfx()"
+    },
+    {
+      "label": "fmtPnl()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "src_app_fmtpnl",
+      "community": 0,
+      "norm_label": "fmtpnl()"
+    },
+    {
       "label": "useWallet()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L8",
+      "source_location": "L10",
       "_origin": "ast",
       "id": "src_app_usewallet",
       "community": 1,
@@ -37,7 +57,7 @@
       "label": "useCandles()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L22",
+      "source_location": "L24",
       "_origin": "ast",
       "id": "src_app_usecandles",
       "community": 1,
@@ -47,7 +67,7 @@
       "label": "Card()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L41",
+      "source_location": "L43",
       "_origin": "ast",
       "id": "src_app_card",
       "community": 0,
@@ -57,7 +77,7 @@
       "label": "WalletPanel()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L44",
+      "source_location": "L46",
       "_origin": "ast",
       "id": "src_app_walletpanel",
       "community": 2,
@@ -67,7 +87,7 @@
       "label": "Positions()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L67",
+      "source_location": "L69",
       "_origin": "ast",
       "id": "src_app_positions",
       "community": 0,
@@ -77,7 +97,7 @@
       "label": "ModeToggle()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L88",
+      "source_location": "L92",
       "_origin": "ast",
       "id": "src_app_modetoggle",
       "community": 0,
@@ -87,7 +107,7 @@
       "label": "Dashboard()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L107",
+      "source_location": "L111",
       "_origin": "ast",
       "id": "src_app_dashboard",
       "community": 1,
@@ -97,7 +117,7 @@
       "label": "TradeButtons()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L138",
+      "source_location": "L142",
       "_origin": "ast",
       "id": "src_app_tradebuttons",
       "community": 0,
@@ -107,7 +127,7 @@
       "label": "OptionsView()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L140",
+      "source_location": "L144",
       "_origin": "ast",
       "id": "src_app_optionsview",
       "community": 1,
@@ -117,7 +137,7 @@
       "label": "FuturesView()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L168",
+      "source_location": "L172",
       "_origin": "ast",
       "id": "src_app_futuresview",
       "community": 1,
@@ -127,17 +147,27 @@
       "label": "EquityView()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L198",
+      "source_location": "L202",
       "_origin": "ast",
       "id": "src_app_equityview",
       "community": 1,
       "norm_label": "equityview()"
     },
     {
+      "label": "ForexView()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L235",
+      "_origin": "ast",
+      "id": "src_app_forexview",
+      "community": 1,
+      "norm_label": "forexview()"
+    },
+    {
       "label": "RecoView()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L231",
+      "source_location": "L316",
       "_origin": "ast",
       "id": "src_app_recoview",
       "community": 1,
@@ -147,7 +177,7 @@
       "label": "HistRow()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L261",
+      "source_location": "L346",
       "_origin": "ast",
       "id": "src_app_histrow",
       "community": 2,
@@ -157,7 +187,7 @@
       "label": "HistoryView()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L285",
+      "source_location": "L370",
       "_origin": "ast",
       "id": "src_app_historyview",
       "community": 0,
@@ -167,7 +197,7 @@
       "label": "AdminView()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L310",
+      "source_location": "L395",
       "_origin": "ast",
       "id": "src_app_adminview",
       "community": 0,
@@ -177,7 +207,7 @@
       "label": "AskView()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L348",
+      "source_location": "L433",
       "_origin": "ast",
       "id": "src_app_askview",
       "community": 0,
@@ -187,7 +217,7 @@
       "label": "NAV",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L377",
+      "source_location": "L462",
       "_origin": "ast",
       "id": "src_app_nav",
       "community": 0,
@@ -197,7 +227,7 @@
       "label": "ChangePassword()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L389",
+      "source_location": "L476",
       "_origin": "ast",
       "id": "src_app_changepassword",
       "community": 0,
@@ -207,7 +237,7 @@
       "label": "Sidebar()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L406",
+      "source_location": "L493",
       "_origin": "ast",
       "id": "src_app_sidebar",
       "community": 0,
@@ -217,7 +247,7 @@
       "label": "AuthGate()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L429",
+      "source_location": "L516",
       "_origin": "ast",
       "id": "src_app_authgate",
       "community": 0,
@@ -227,7 +257,7 @@
       "label": "App()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L460",
+      "source_location": "L547",
       "_origin": "ast",
       "id": "src_app_app",
       "community": 0,
@@ -241,9 +271,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L310",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_app_adminview",
-      "confidence_score": 1.0
+      "target": "src_app_adminview"
     },
     {
       "relation": "contains",
@@ -251,9 +281,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L460",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_app_app",
-      "confidence_score": 1.0
+      "target": "src_app_app"
     },
     {
       "relation": "contains",
@@ -261,9 +291,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L348",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_app_askview",
-      "confidence_score": 1.0
+      "target": "src_app_askview"
     },
     {
       "relation": "contains",
@@ -271,9 +301,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L429",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_app_authgate",
-      "confidence_score": 1.0
+      "target": "src_app_authgate"
     },
     {
       "relation": "contains",
@@ -281,9 +311,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L41",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_app_card",
-      "confidence_score": 1.0
+      "target": "src_app_card"
     },
     {
       "relation": "contains",
@@ -291,9 +321,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L389",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_app_changepassword",
-      "confidence_score": 1.0
+      "target": "src_app_changepassword"
     },
     {
       "relation": "contains",
@@ -301,9 +331,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L107",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_app_dashboard",
-      "confidence_score": 1.0
+      "target": "src_app_dashboard"
     },
     {
       "relation": "contains",
@@ -311,9 +341,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L198",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_app_equityview",
-      "confidence_score": 1.0
+      "target": "src_app_equityview"
     },
     {
       "relation": "contains",
@@ -321,78 +351,28 @@
       "source_file": "src/App.jsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_app_fmt",
+      "target": "src_app_fmt"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_fmtfx",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/App.jsx",
-      "source_location": "L168",
+      "source_location": "L7",
       "weight": 1.0,
       "source": "src_app",
-      "target": "src_app_futuresview",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/App.jsx",
-      "source_location": "L285",
-      "weight": 1.0,
-      "source": "src_app",
-      "target": "src_app_historyview",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/App.jsx",
-      "source_location": "L261",
-      "weight": 1.0,
-      "source": "src_app",
-      "target": "src_app_histrow",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/App.jsx",
-      "source_location": "L88",
-      "weight": 1.0,
-      "source": "src_app",
-      "target": "src_app_modetoggle",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/App.jsx",
-      "source_location": "L377",
-      "weight": 1.0,
-      "source": "src_app",
-      "target": "src_app_nav",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/App.jsx",
-      "source_location": "L140",
-      "weight": 1.0,
-      "source": "src_app",
-      "target": "src_app_optionsview",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/App.jsx",
-      "source_location": "L67",
-      "weight": 1.0,
-      "source": "src_app",
-      "target": "src_app_positions",
+      "target": "src_app_fmtpnl",
       "confidence_score": 1.0
     },
     {
@@ -401,9 +381,89 @@
       "source_file": "src/App.jsx",
       "source_location": "L231",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_app_recoview",
-      "confidence_score": 1.0
+      "target": "src_app_forexview"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L168",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app",
+      "target": "src_app_futuresview"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L285",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app",
+      "target": "src_app_historyview"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L261",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app",
+      "target": "src_app_histrow"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L88",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app",
+      "target": "src_app_modetoggle"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L377",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app",
+      "target": "src_app_nav"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L140",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app",
+      "target": "src_app_optionsview"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L67",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app",
+      "target": "src_app_positions"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L231",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app",
+      "target": "src_app_recoview"
     },
     {
       "relation": "contains",
@@ -411,9 +471,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L406",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_app_sidebar",
-      "confidence_score": 1.0
+      "target": "src_app_sidebar"
     },
     {
       "relation": "contains",
@@ -421,9 +481,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L138",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_app_tradebuttons",
-      "confidence_score": 1.0
+      "target": "src_app_tradebuttons"
     },
     {
       "relation": "contains",
@@ -431,9 +491,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L22",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_app_usecandles",
-      "confidence_score": 1.0
+      "target": "src_app_usecandles"
     },
     {
       "relation": "contains",
@@ -441,9 +501,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_app_usewallet",
-      "confidence_score": 1.0
+      "target": "src_app_usewallet"
     },
     {
       "relation": "contains",
@@ -451,9 +511,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L44",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_app_walletpanel",
-      "confidence_score": 1.0
+      "target": "src_app_walletpanel"
     },
     {
       "relation": "calls",
@@ -462,9 +522,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L275",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_histrow",
-      "target": "src_app_fmt",
-      "confidence_score": 1.0
+      "target": "src_app_fmt"
     },
     {
       "relation": "calls",
@@ -473,9 +533,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L50",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_walletpanel",
-      "target": "src_app_fmt",
-      "confidence_score": 1.0
+      "target": "src_app_fmt"
     },
     {
       "relation": "calls",
@@ -484,9 +544,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L108",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_dashboard",
-      "target": "src_app_usewallet",
-      "confidence_score": 1.0
+      "target": "src_app_usewallet"
     },
     {
       "relation": "calls",
@@ -495,31 +555,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L199",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_equityview",
-      "target": "src_app_usewallet",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/App.jsx",
-      "source_location": "L169",
-      "weight": 1.0,
-      "source": "src_app_futuresview",
-      "target": "src_app_usewallet",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/App.jsx",
-      "source_location": "L141",
-      "weight": 1.0,
-      "source": "src_app_optionsview",
-      "target": "src_app_usewallet",
-      "confidence_score": 1.0
+      "target": "src_app_usewallet"
     },
     {
       "relation": "calls",
@@ -528,9 +566,42 @@
       "source_file": "src/App.jsx",
       "source_location": "L232",
       "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app_forexview",
+      "target": "src_app_usewallet"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L169",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app_futuresview",
+      "target": "src_app_usewallet"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L141",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app_optionsview",
+      "target": "src_app_usewallet"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L232",
+      "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_recoview",
-      "target": "src_app_usewallet",
-      "confidence_score": 1.0
+      "target": "src_app_usewallet"
     },
     {
       "relation": "calls",
@@ -539,9 +610,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L202",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_equityview",
-      "target": "src_app_usecandles",
-      "confidence_score": 1.0
+      "target": "src_app_usecandles"
     },
     {
       "relation": "calls",
@@ -550,9 +621,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L171",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_futuresview",
-      "target": "src_app_usecandles",
-      "confidence_score": 1.0
+      "target": "src_app_usecandles"
     },
     {
       "relation": "calls",
@@ -561,9 +632,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L142",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_optionsview",
-      "target": "src_app_usecandles",
-      "confidence_score": 1.0
+      "target": "src_app_usecandles"
     },
     {
       "relation": "calls",
@@ -572,11 +643,11 @@
       "source_file": "src/App.jsx",
       "source_location": "L237",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_recoview",
-      "target": "src_app_usecandles",
-      "confidence_score": 1.0
+      "target": "src_app_usecandles"
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "a5809ae6db0d934fe5c55331b0047a8545bbddbc"
+  "built_at_commit": "d0b3d8bef913d9db24acacf11d13b7ec3057deec"
 }

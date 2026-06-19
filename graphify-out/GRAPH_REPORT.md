@@ -1,16 +1,16 @@
-# Graph Report - trading-ai-frontend  (2026-06-18)
+# Graph Report - trading-ai-frontend  (2026-06-19)
 
 ## Corpus Check
-- 8 files · ~4,025 words
+- 8 files · ~4,486 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 23 nodes · 33 edges · 3 communities (2 shown, 1 thin omitted)
+- 26 nodes · 37 edges · 3 communities (2 shown, 1 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a5809ae6`
+- Built from commit: `d0b3d8be`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -20,7 +20,7 @@
 - [[_COMMUNITY_Community 2|Community 2]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `useWallet()` - 6 edges
+1. `useWallet()` - 7 edges
 2. `useCandles()` - 5 edges
 3. `fmt()` - 3 edges
 4. `OptionsView()` - 3 edges
@@ -29,7 +29,7 @@
 7. `RecoView()` - 3 edges
 8. `WalletPanel()` - 2 edges
 9. `Dashboard()` - 2 edges
-10. `HistRow()` - 2 edges
+10. `ForexView()` - 2 edges
 
 ## Surprising Connections (you probably didn't know these)
 - None detected - all connections are within the same source files.
@@ -40,8 +40,8 @@
 ## Communities (3 total, 1 thin omitted)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.43
-Nodes (7): Dashboard(), EquityView(), FuturesView(), OptionsView(), RecoView(), useCandles(), useWallet()
+Cohesion: 0.36
+Nodes (8): Dashboard(), EquityView(), ForexView(), FuturesView(), OptionsView(), RecoView(), useCandles(), useWallet()
 
 ### Community 2 - "Community 2"
 Cohesion: 0.67
@@ -56,10 +56,12 @@ Nodes (3): fmt(), HistRow(), WalletPanel()
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `useWallet()` connect `Community 1` to `Community 0`?**
-  _High betweenness centrality (0.017) - this node is a cross-community bridge._
+  _High betweenness centrality (0.022) - this node is a cross-community bridge._
 - **Why does `useCandles()` connect `Community 1` to `Community 0`?**
-  _High betweenness centrality (0.009) - this node is a cross-community bridge._
+  _High betweenness centrality (0.007) - this node is a cross-community bridge._
 - **Why does `fmt()` connect `Community 2` to `Community 0`?**
   _High betweenness centrality (0.002) - this node is a cross-community bridge._
 - **What connects `NAV` to the rest of the system?**
   _1 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Community 0` be split into smaller, more focused modules?**
+  _Cohesion score 0.13333333333333333 - nodes in this community are weakly interconnected._
