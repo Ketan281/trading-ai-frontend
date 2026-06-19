@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback } from 'react'
-import { apiGet, apiPost, getToken, setToken, setAuthFailHandler } from './api'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { apiGet, apiPost, getToken, setToken, setAuthFailHandler, API } from './api'
 import CandleChart from './CandleChart.jsx'
 
 const fmt = (n) => n == null ? '–' : '₹' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 })
+const fmtUsd = (n) => n == null ? '–' : '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 })
 const fmtFx = (n) => n == null ? '–' : Number(n).toFixed(5)
 const fmtPnl = (n, fx) => n == null ? '–' : (fx ? '$' : '₹') + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 })
 
@@ -39,34 +40,84 @@ function useCandles(symbol) {
   return candles
 }
 
+function useLiveStream() {
+  const [snapshot, setSnapshot] = useState(null)
+  const esRef = useRef(null)
+  useEffect(() => {
+    const tok = getToken()
+    if (!tok) return
+    const url = `${API}/me/live?token=${encodeURIComponent(tok)}`
+    const es = new EventSource(url)
+    esRef.current = es
+    es.onmessage = (e) => {
+      try { setSnapshot(JSON.parse(e.data)) } catch {}
+    }
+    es.onerror = () => { es.close() }
+    return () => es.close()
+  }, [])
+  return snapshot
+}
+
 // ── small shared bits ──
 const Card = ({ k, v, cls }) =>
   <div className="c"><div className="k">{k}</div><div className={'v ' + (cls || '')}>{v}</div></div>
 
-function WalletPanel({ wallet, refresh }) {
+function WalletPanel({ wallet, fxWallet, refresh }) {
   const [dep, setDep] = useState('')
-  if (!wallet) return <div className="answer">Loading wallet…</div>
-  const w = wallet.wallet, cls = (wallet.unrealized || 0) >= 0 ? 'ok' : 'err'
+  const [fxDep, setFxDep] = useState('')
+  if (!wallet) return <div className="answer">Loading wallet...</div>
+  const w = wallet
   return <>
-    <div className="cards">
-      <Card k="Balance" v={fmt(w.balance)} />
-      <Card k="Live equity" v={fmt(wallet.live_equity)} />
-      <Card k="Unrealized" v={fmt(wallet.unrealized)} cls={cls} />
-      <Card k="Realized P&L" v={fmt(w.realized_pnl)} />
-    </div>
-    <div className="box" style={{ marginTop: 12 }}>
-      <input type="number" placeholder="add paper funds (e.g. 50000)" value={dep}
-             onChange={(e) => setDep(e.target.value)} />
-      <button disabled={!dep} onClick={async () => {
-        const r = await apiPost('/me/wallet/deposit', { amount: Number(dep) })
-        if (r.error) alert(r.error)
-        setDep(''); refresh()
-      }}>Add</button>
+    <div className="wallet-grid">
+      <div className="wallet-section">
+        <div className="wallet-header inr">Indian Market (INR)</div>
+        <div className="cards">
+          <Card k="Balance" v={fmt(w.balance)} />
+          <Card k="Realized P&L" v={fmt(w.realized_pnl)} />
+        </div>
+        <div className="box" style={{ marginTop: 10 }}>
+          <input type="number" placeholder="add paper funds (INR)" value={dep}
+                 onChange={(e) => setDep(e.target.value)} />
+          <button disabled={!dep} onClick={async () => {
+            const r = await apiPost('/me/wallet/deposit', { amount: Number(dep) })
+            if (r.error) alert(r.error)
+            setDep(''); refresh()
+          }}>Add</button>
+        </div>
+      </div>
+      {fxWallet && <div className="wallet-section">
+        <div className="wallet-header usd">Forex (USD)</div>
+        <div className="cards">
+          <Card k="Balance" v={fmtUsd(fxWallet.balance)} />
+          <Card k="Realized P&L" v={fmtUsd(fxWallet.realized_pnl)} />
+        </div>
+        <div className="box" style={{ marginTop: 10 }}>
+          <input type="number" placeholder="deposit USD (max $100k)" value={fxDep}
+                 onChange={(e) => setFxDep(e.target.value)} />
+          <button disabled={!fxDep} onClick={async () => {
+            const r = await apiPost('/me/forex-wallet/deposit', { amount: Number(fxDep) })
+            if (r.error) alert(r.error)
+            setFxDep(''); refresh()
+          }}>Add</button>
+        </div>
+      </div>}
     </div>
   </>
 }
 
-function Positions({ trades, refresh }) {
+function LiveEquityBar({ data }) {
+  if (!data) return null
+  const iCls = (data.unrealized || 0) >= 0 ? 'ok' : 'err'
+  const fCls = (data.forex_unrealized || 0) >= 0 ? 'ok' : 'err'
+  return <div className="cards" style={{ marginTop: 12 }}>
+    <Card k="Indian Live Equity" v={fmt(data.live_equity)} cls={iCls} />
+    <Card k="Indian Unrealized" v={fmt(data.unrealized)} cls={iCls} />
+    <Card k="Forex Live Equity" v={fmtUsd(data.forex_live_equity)} cls={fCls} />
+    <Card k="Forex Unrealized" v={fmtUsd(data.forex_unrealized)} cls={fCls} />
+  </div>
+}
+
+function Positions({ trades, refresh, title, fxMode }) {
   if (!trades || !trades.length) return <div className="mut" style={{ marginTop: 10 }}>No open positions.</div>
   return (
     <table className="hist">
@@ -88,21 +139,71 @@ function Positions({ trades, refresh }) {
   )
 }
 
-// ── mode toggle ──
-function ModeToggle({ mode, onToggle }) {
-  const isML = mode === 'ml'
-  return <div className="mode-toggle">
-    <div className="mode-label">Trading Mode</div>
-    <div className="mode-switch">
-      <button className={'mode-btn' + (!isML ? ' active' : '')} onClick={() => onToggle('custom')}>
-        Custom <span className="mode-desc">You trade manually</span>
-      </button>
-      <button className={'mode-btn ml' + (isML ? ' active' : '')} onClick={() => onToggle('ml')}>
-        ML Auto <span className="mode-desc">System picks & manages</span>
-      </button>
+// ── P&L mini chart (SVG) ──
+function PnlMiniChart({ series, fx }) {
+  if (!series || series.length < 2) return null
+  const w = 500, h = 100, pad = 20
+  const pnls = series.map(s => s[2])
+  const lo = Math.min(0, ...pnls), hi = Math.max(0, ...pnls)
+  const span = hi - lo || 1
+  const xp = (i) => pad + (i / (series.length - 1)) * (w - 2 * pad)
+  const yp = (v) => h - pad - ((v - lo) / span) * (h - 2 * pad)
+  const path = series.map((s, i) => `${i ? 'L' : 'M'}${xp(i).toFixed(1)},${yp(s[2]).toFixed(1)}`).join(' ')
+  const last = pnls[pnls.length - 1]
+  const col = last >= 0 ? '#22c55e' : '#ef4444'
+  return <svg className="chart" viewBox={`0 0 ${w} ${h}`} style={{ height: 100, marginTop: 8 }}>
+    <line x1={pad} x2={w - pad} y1={yp(0)} y2={yp(0)} stroke="#2a3446" strokeDasharray="4 4" />
+    <path d={`${path} L${xp(series.length - 1)},${yp(0)} L${xp(0)},${yp(0)} Z`} fill={col} opacity="0.12" />
+    <path d={path} fill="none" stroke={col} strokeWidth="2" />
+    <circle cx={xp(series.length - 1)} cy={yp(last)} r="3" fill={col} />
+    <text x={w - pad} y={14} fill={col} fontSize="12" textAnchor="end" fontWeight="600">
+      {fx ? fmtUsd(last) : fmt(last)}
+    </text>
+  </svg>
+}
+
+// ── mode toggle — separate for Indian + Forex ──
+function DualModeToggle({ indianMode, forexMode, onToggle, toggling, autoOpened }) {
+  return <div className="dual-mode">
+    <div className="mode-toggle">
+      <div className="mode-label">Indian Market — ML Mode</div>
+      <div className="mode-switch">
+        <button className={'mode-btn' + (indianMode !== 'ml' ? ' active' : '')}
+                disabled={toggling} onClick={() => onToggle('custom', 'indian')}>
+          Custom <span className="mode-desc">Manual trading</span>
+        </button>
+        <button className={'mode-btn ml' + (indianMode === 'ml' ? ' active' : '')}
+                disabled={toggling} onClick={() => onToggle('ml', 'indian')}>
+          ML Auto <span className="mode-desc">System picks & manages</span>
+        </button>
+      </div>
+      {indianMode === 'ml' && <div className="mode-info">
+        Auto-trades Indian market during 9:15–15:15 IST. Picks best option/future, manages SL & target.
+      </div>}
     </div>
-    {isML && <div className="mode-info">
-      The system automatically picks the best trade each day, enters it, monitors stop-loss & target, and closes it. You can still view everything and manually square off if needed.
+    <div className="mode-toggle">
+      <div className="mode-label">Forex — ML Mode</div>
+      <div className="mode-switch">
+        <button className={'mode-btn' + (forexMode !== 'ml' ? ' active' : '')}
+                disabled={toggling} onClick={() => onToggle('custom', 'forex')}>
+          Custom <span className="mode-desc">Manual trading</span>
+        </button>
+        <button className={'mode-btn ml' + (forexMode === 'ml' ? ' active' : '')}
+                disabled={toggling} onClick={() => onToggle('ml', 'forex')}>
+          ML Auto <span className="mode-desc">24/5 confluence engine</span>
+        </button>
+      </div>
+      {forexMode === 'ml' && <div className="mode-info">
+        Auto-trades forex 24/5 using multi-timeframe confluence (27 indicators). Manages SL & TP automatically.
+      </div>}
+    </div>
+    {autoOpened && autoOpened.length > 0 && <div className="auto-opened-feedback">
+      {autoOpened.map((a, i) => <div key={i} className={'auto-msg ' + (a.error ? 'err' : a.trade ? 'ok' : '')}>
+        <b>{a.market?.toUpperCase()}:</b>{' '}
+        {a.trade ? `Opened ${a.symbol} (${a.trade.side})` :
+         a.error ? `Error: ${a.error}` :
+         a.info || 'No trade available'}
+      </div>)}
     </div>}
   </div>
 }
@@ -111,30 +212,79 @@ function ModeToggle({ mode, onToggle }) {
 function Dashboard() {
   const { data, refresh } = useWallet()
   const [reco, setReco] = useState(null)
-  const [mode, setMode] = useState(null)
+  const [indianMode, setIndianMode] = useState('custom')
+  const [forexMode, setForexMode] = useState('custom')
   const [toggling, setToggling] = useState(false)
+  const [autoOpened, setAutoOpened] = useState(null)
+  const live = useLiveStream()
+
   useEffect(() => { apiGet('/recommendation').then(setReco).catch((e) => setReco({ answer: e.message })) }, [])
-  useEffect(() => { if (data?.trade_mode) setMode(data.trade_mode) }, [data])
-  async function toggleMode(m) {
+  useEffect(() => {
+    if (data?.indian_trade_mode) setIndianMode(data.indian_trade_mode)
+    if (data?.forex_trade_mode) setForexMode(data.forex_trade_mode)
+  }, [data])
+
+  async function toggleMode(mode, market) {
     setToggling(true)
+    setAutoOpened(null)
     try {
-      await apiPost('/me/mode', { mode: m })
-      setMode(m); refresh()
+      const endpoint = market === 'forex' ? '/me/mode/forex' : '/me/mode/indian'
+      const r = await apiPost(endpoint, { mode })
+      if (r.auto_opened) setAutoOpened(r.auto_opened)
+      if (market === 'indian') setIndianMode(mode)
+      else setForexMode(mode)
+      refresh()
     } catch (e) { alert(e.message) } finally { setToggling(false) }
   }
+
+  // Merge: use polled data for wallets/modes, overlay SSE live prices when available
+  const merged = data ? { ...data } : null
+  if (merged && live) {
+    merged.live_equity = live.indian_equity ?? merged.live_equity
+    merged.forex_live_equity = live.forex_equity ?? merged.forex_live_equity
+    if (live.trades?.length) {
+      const liveUnrealI = live.trades.filter(t => t.segment !== 'forex').reduce((s, t) => s + (t.gross_pnl || 0), 0)
+      const liveUnrealF = live.trades.filter(t => t.segment === 'forex').reduce((s, t) => s + (t.gross_pnl || 0), 0)
+      merged.unrealized = liveUnrealI
+      merged.forex_unrealized = liveUnrealF
+    }
+  }
+  const displayData = merged
+  const indianTrades = displayData?.indian_open_trades || (displayData?.open_trades || []).filter(t => t.segment !== 'forex')
+  const forexTrades = displayData?.forex_open_trades || (displayData?.open_trades || []).filter(t => t.segment === 'forex')
+
   return <>
-    <h2>Dashboard</h2><div className="crumb">Your paper wallet & today's idea</div>
-    {mode !== null && <ModeToggle mode={mode} onToggle={toggleMode} />}
-    {toggling && <div className="mut">Switching mode…</div>}
-    <WalletPanel wallet={data} refresh={refresh} />
-    {mode === 'ml'
-      ? <div className="panel ml-panel"><h3>🤖 ML Mode Active</h3>
-          <div className="answer">The system is managing your trades automatically. It will pick the best trade during market hours, enter with proper risk management (SL + target), and close at exit or 3:15 PM.</div>
+    <h2>Dashboard</h2><div className="crumb">Your wallets, positions & ML auto-trading</div>
+    <DualModeToggle indianMode={indianMode} forexMode={forexMode}
+                    onToggle={toggleMode} toggling={toggling} autoOpened={autoOpened} />
+    {toggling && <div className="mut">Switching mode...</div>}
+    <WalletPanel wallet={displayData?.wallet || displayData?.indian_wallet}
+                 fxWallet={displayData?.forex_wallet} refresh={refresh} />
+    <LiveEquityBar data={displayData} />
+
+    {(indianMode === 'ml' || forexMode === 'ml') &&
+      <div className="panel ml-panel"><h3>ML Auto-Trading Active</h3>
+        <div className="answer">
+          {indianMode === 'ml' && <div>Indian market: auto-managed during 9:15–15:15 IST</div>}
+          {forexMode === 'ml' && <div>Forex: auto-managed 24/5 via confluence engine</div>}
+          <div className="mut" style={{ marginTop: 6 }}>Background loop runs every 60s. Entries with SL + target, auto-exit on hit or square-off time.</div>
         </div>
-      : <div className="panel"><h3>⭐ Today's best idea</h3>
-          {reco ? <div className="answer">{reco.answer}</div> : <div className="mut">Loading…</div>}
-        </div>}
-    <div className="panel"><h3>Open positions</h3><Positions trades={data?.open_trades} refresh={refresh} /></div>
+      </div>}
+
+    {indianMode !== 'ml' && <div className="panel"><h3>Today's best idea (Indian)</h3>
+      {reco ? <div className="answer">{reco.answer}</div> : <div className="mut">Loading...</div>}
+    </div>}
+
+    <div className="panel">
+      <h3>Indian Positions ({indianTrades.length})</h3>
+      <Positions trades={indianTrades} refresh={refresh} />
+      {indianTrades.map(t => <PnlMiniChart key={t.id} series={t.pnl_series} fx={false} />)}
+    </div>
+    <div className="panel">
+      <h3>Forex Positions ({forexTrades.length})</h3>
+      <Positions trades={forexTrades} refresh={refresh} fxMode />
+      {forexTrades.map(t => <PnlMiniChart key={t.id} series={t.pnl_series} fx={true} />)}
+    </div>
     <div className="foot">Quantitative engines produce every number · the AI only summarizes · paper money only, no profit guarantee</div>
   </>
 }
@@ -147,16 +297,17 @@ function OptionsView({ sym }) {
   const [levels, setLevels] = useState(null)
   const [msg, setMsg] = useState('')
   async function take(leg) {
-    setMsg('Placing…')
+    setMsg('Placing...')
     try {
       const r = await apiPost('/me/trade', { segment: 'options', underlying: sym, leg })
       if (r.error) { setMsg(r.error); return }
       const t = r.trade
       setLevels({ entry: t.entry, stop: t.stop, target: t.target })
-      setMsg(`Opened ${t.symbol} @ ${fmt(t.entry)} ×${t.qty} (SL ${fmt(t.stop)} · TGT ${fmt(t.target)})`)
+      setMsg(`Opened ${t.symbol} @ ${fmt(t.entry)} x${t.qty} (SL ${fmt(t.stop)} · TGT ${fmt(t.target)})`)
       refresh()
     } catch (e) { setMsg(e.message) }
   }
+  const indianTrades = (data?.open_trades || []).filter(t => t.segment !== 'forex')
   return <>
     <h2>Options · {sym}</h2><div className="crumb">ATM weekly option — buy CE or PE</div>
     <div className="row">
@@ -165,7 +316,7 @@ function OptionsView({ sym }) {
     </div>
     <TradeButtons msg={msg} />
     <CandleChart candles={candles} levels={levels} title={`${sym} · 5m`} />
-    <div className="panel"><h3>Open positions</h3><Positions trades={data?.open_trades} refresh={refresh} /></div>
+    <div className="panel"><h3>Open positions</h3><Positions trades={indianTrades} refresh={refresh} /></div>
   </>
 }
 
@@ -176,15 +327,16 @@ function FuturesView() {
   const [levels, setLevels] = useState(null)
   const [msg, setMsg] = useState('')
   async function take(side) {
-    setMsg('Placing…')
+    setMsg('Placing...')
     try {
       const r = await apiPost('/me/trade', { segment: 'futures', underlying: sym, side })
       if (r.error) { setMsg(r.error); return }
       const t = r.trade
       setLevels({ entry: t.entry, stop: t.stop, target: t.target })
-      setMsg(`Opened ${t.symbol} @ ${fmt(t.entry)} ×${t.qty}`); refresh()
+      setMsg(`Opened ${t.symbol} @ ${fmt(t.entry)} x${t.qty}`); refresh()
     } catch (e) { setMsg(e.message) }
   }
+  const indianTrades = (data?.open_trades || []).filter(t => t.segment !== 'forex')
   return <>
     <h2>Futures</h2><div className="crumb">Index futures (leveraged, ~15% SPAN margin)</div>
     <div className="row">
@@ -195,7 +347,7 @@ function FuturesView() {
     </div>
     <TradeButtons msg={msg} />
     <CandleChart candles={candles} levels={levels} title={`${sym} · 5m`} />
-    <div className="panel"><h3>Open positions</h3><Positions trades={data?.open_trades} refresh={refresh} /></div>
+    <div className="panel"><h3>Open positions</h3><Positions trades={indianTrades} refresh={refresh} /></div>
   </>
 }
 
@@ -209,15 +361,16 @@ function EquityView() {
   async function take(side) {
     const spec = { segment: 'equity', symbol: sym.toUpperCase().trim(), side }
     if (qty) spec.qty = Number(qty)
-    setMsg('Placing…')
+    setMsg('Placing...')
     try {
       const r = await apiPost('/me/trade', spec)
       if (r.error) { setMsg(r.error); return }
       const t = r.trade
       setLevels({ entry: t.entry, stop: t.stop, target: t.target })
-      setMsg(`Opened ${t.symbol} @ ${fmt(t.entry)} ×${t.qty}`); refresh()
+      setMsg(`Opened ${t.symbol} @ ${fmt(t.entry)} x${t.qty}`); refresh()
     } catch (e) { setMsg(e.message) }
   }
+  const indianTrades = (data?.open_trades || []).filter(t => t.segment !== 'forex')
   return <>
     <h2>Intraday Equity</h2><div className="crumb">Cash-segment intraday on a liquid stock</div>
     <div className="row">
@@ -228,7 +381,7 @@ function EquityView() {
     </div>
     <TradeButtons msg={msg} />
     <CandleChart candles={candles} levels={levels} title={`${sym.toUpperCase()} · 5m`} />
-    <div className="panel"><h3>Open positions</h3><Positions trades={data?.open_trades} refresh={refresh} /></div>
+    <div className="panel"><h3>Open positions</h3><Positions trades={indianTrades} refresh={refresh} /></div>
   </>
 }
 
@@ -258,19 +411,25 @@ function ForexView() {
   }
   useEffect(() => { loadSignals() }, [pair])
   async function take(side) {
-    setMsg('Placing…')
+    setMsg('Placing...')
     try {
       const r = await apiPost('/me/trade', { segment: 'forex', pair, side })
       if (r.error) { setMsg(r.error); return }
       const t = r.trade
       setLevels({ entry: t.entry, stop: t.stop, target: t.target })
-      setMsg(`Opened ${t.symbol} ${side} @ ${t.entry} ×${t.qty.toLocaleString()}`); refresh()
+      setMsg(`Opened ${t.symbol} ${side} @ ${t.entry} x${t.qty.toLocaleString()}`); refresh()
     } catch (e) { setMsg(e.message) }
   }
+  const fxWallet = data?.forex_wallet
+  const forexTrades = (data?.open_trades || []).filter(t => t.segment === 'forex')
   const dir = signals?.direction
   return <>
     <h2>Forex Trading</h2>
-    <div className="crumb">Multi-timeframe confluence analysis · 19 indicators · paper trading</div>
+    <div className="crumb">Multi-timeframe confluence analysis · 27 indicators · paper trading</div>
+    {fxWallet && <div className="cards" style={{ marginBottom: 14 }}>
+      <Card k="Forex Balance" v={fmtUsd(fxWallet.balance)} />
+      <Card k="Forex Realized" v={fmtUsd(fxWallet.realized_pnl)} />
+    </div>}
     <div className="row">
       <select value={pair} onChange={(e) => { setPair(e.target.value); setLevels(null); setSignals(null) }}>
         {(pairs.length ? pairs : ['EUR/USD']).map(p => <option key={p} value={p}>{p}</option>)}
@@ -307,9 +466,9 @@ function ForexView() {
         R:R {signals.trade_plan.risk_reward}:1
       </div>}
     </div>}
-    {loadingSig && <div className="mut" style={{ marginTop: 8 }}>Analysing {pair} across all timeframes…</div>}
+    {loadingSig && <div className="mut" style={{ marginTop: 8 }}>Analysing {pair} across all timeframes...</div>}
     <CandleChart candles={candles} levels={levels} title={`${pair} · 15m`} />
-    <div className="panel"><h3>Open positions</h3><Positions trades={data?.open_trades} refresh={refresh} /></div>
+    <div className="panel"><h3>Forex Positions</h3><Positions trades={forexTrades} refresh={refresh} fxMode /></div>
   </>
 }
 
@@ -322,18 +481,18 @@ function RecoView() {
   const candles = useCandles(reco?.chart_symbol)
   async function take() {
     if (!reco?.spec) return
-    setMsg('Placing…')
+    setMsg('Placing...')
     try {
       const r = await apiPost('/me/trade', reco.spec)
       if (r.error) { setMsg(r.error); return }
       const t = r.trade
       setLevels({ entry: t.entry, stop: t.stop, target: t.target })
-      setMsg(`Opened ${t.symbol} @ ${fmt(t.entry)} ×${t.qty}`); refresh()
+      setMsg(`Opened ${t.symbol} @ ${fmt(t.entry)} x${t.qty}`); refresh()
     } catch (e) { setMsg(e.message) }
   }
   return <>
     <h2>Best Recommendation</h2><div className="crumb">Today's single highest-conviction idea</div>
-    {!reco ? <div className="mut">Computing today's best trade…</div> : <>
+    {!reco ? <div className="mut">Computing today's best trade...</div> : <>
       <div className="answer">{reco.answer}</div>
       {reco.spec && <div className="row" style={{ marginTop: 10 }}><button onClick={take}>Take this trade</button></div>}
       <TradeButtons msg={msg} />
@@ -347,8 +506,10 @@ function HistRow({ t }) {
   const [why, setWhy] = useState(t.ai_why || '')
   const [busy, setBusy] = useState(false)
   const closed = t.status !== 'open'
+  const fx = t.segment === 'forex'
+  const p = fx ? fmtUsd : fmt
   async function explain() {
-    setBusy(true); setWhy('Analyzing why this trade was taken…')
+    setBusy(true); setWhy('Analyzing why this trade was taken...')
     try { const d = await apiPost(`/me/trade/${t.id}/explain`); setWhy(d.ai_why || d.error || '(no analysis)') }
     catch (e) { setWhy(e.message) } finally { setBusy(false) }
   }
@@ -357,12 +518,12 @@ function HistRow({ t }) {
       <div><b>{t.symbol}</b> <span className="mut">{t.segment} · {t.side}</span>{' '}
         <span className="tag">{closed ? (t.exit_reason || 'closed') : 'OPEN'}</span></div>
       <div className={closed ? (t.net_pnl >= 0 ? 'ok' : 'err') : 'mut'} style={{ fontWeight: 600 }}>
-        {closed ? fmt(t.net_pnl) : 'live'}</div>
+        {closed ? p(t.net_pnl) : 'live'}</div>
     </div>
-    <div className="mut hr-detail">Entry {fmt(t.entry)} · SL {fmt(t.stop)} · TGT {fmt(t.target)}{
-      closed ? ` · Exit ${fmt(t.exit_price)}` : ''} · Qty {t.qty}</div>
+    <div className="mut hr-detail">Entry {p(t.entry)} · SL {p(t.stop)} · TGT {p(t.target)}{
+      closed ? ` · Exit ${p(t.exit_price)}` : ''} · Qty {t.qty}</div>
     {t.analysis && <div className="mut hr-detail">{t.analysis}</div>}
-    <button className="mini" disabled={busy} onClick={explain} style={{ marginTop: 8 }}>🧠 Why this trade?</button>
+    <button className="mini" disabled={busy} onClick={explain} style={{ marginTop: 8 }}>Why this trade?</button>
     {why && <div className="aiwhy">{why}</div>}
   </div>
 }
@@ -374,7 +535,7 @@ function HistoryView() {
   return <>
     <h2>Trade History</h2><div className="crumb">Every paper trade you've taken, grouped by date</div>
     {err && <div className="answer err">{err}</div>}
-    {!err && !trades && <div className="mut">Loading…</div>}
+    {!err && !trades && <div className="mut">Loading...</div>}
     {trades && !trades.length && <div className="mut">No trades yet — place one from a trade page.</div>}
     {trades && trades.length > 0 && (() => {
       const groups = {}
@@ -382,9 +543,10 @@ function HistoryView() {
       return Object.keys(groups).sort().reverse().map((date) => {
         const day = groups[date], closed = day.filter((t) => t.status !== 'open')
         const net = closed.reduce((s, t) => s + (t.net_pnl || 0), 0)
+        const hasFx = day.some(t => t.segment === 'forex')
         return <div className="panel" key={date}>
           <h3>{date} <span className={net >= 0 ? 'ok' : 'err'} style={{ fontWeight: 500, fontSize: 13 }}>
-            · {day.length} trade{day.length > 1 ? 's' : ''}, net {fmt(net)}</span></h3>
+            · {day.length} trade{day.length > 1 ? 's' : ''}, net {hasFx ? fmtUsd(net) : fmt(net)}</span></h3>
           {day.map((t) => <HistRow key={t.id} t={t} />)}
         </div>
       })
@@ -408,7 +570,7 @@ function AdminView({ user }) {
   return <>
     <h2>All Users</h2><div className="crumb">Owner view — every paper wallet</div>
     {err && <div className="answer err">{err}</div>}
-    {!err && !overview && <div className="mut">Loading…</div>}
+    {!err && !overview && <div className="mut">Loading...</div>}
     {overview && (
       <table className="hist">
         <thead><tr><th>User</th><th>Role</th><th>Balance</th><th>Live equity</th><th>Realized</th><th>Open</th></tr></thead>
@@ -446,9 +608,9 @@ function AskView() {
     <div className="box">
       <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && ask()}
              placeholder="e.g. best banknifty intraday option today" />
-      <button onClick={() => ask()} disabled={loading}>{loading ? '…' : 'Ask'}</button>
+      <button onClick={() => ask()} disabled={loading}>{loading ? '...' : 'Ask'}</button>
     </div>
-    {loading && <div className="answer">Thinking… (first call can take a few seconds)</div>}
+    {loading && <div className="answer">Thinking... (first call can take a few seconds)</div>}
     {err && <div className="answer err">{err}</div>}
     {res && !loading && <>
       <div className="answer">{res.answer || '(no answer)'}</div>
@@ -460,17 +622,18 @@ function AskView() {
 
 // ── sidebar / shell / auth ──
 const NAV = [
-  { id: 'dashboard', label: '📊 Dashboard' },
-  { group: 'Trade' },
-  { id: 'opt-NIFTY', label: '🟢 Options · NIFTY', sub: true },
-  { id: 'opt-BANKNIFTY', label: '🔵 Options · BANKNIFTY', sub: true },
-  { id: 'futures', label: '📈 Futures' },
-  { id: 'equity', label: '🏦 Intraday Equity' },
+  { id: 'dashboard', label: 'Dashboard' },
+  { group: 'Indian Market' },
+  { id: 'opt-NIFTY', label: 'Options · NIFTY', sub: true },
+  { id: 'opt-BANKNIFTY', label: 'Options · BANKNIFTY', sub: true },
+  { id: 'futures', label: 'Futures' },
+  { id: 'equity', label: 'Intraday Equity' },
   { group: 'Forex' },
-  { id: 'forex', label: '💱 Forex Trading' },
-  { id: 'reco', label: '⭐ Best Recommendation' },
-  { id: 'ask', label: '💬 Ask AI' },
-  { id: 'history', label: '📜 History' },
+  { id: 'forex', label: 'Forex Trading' },
+  { group: 'Tools' },
+  { id: 'reco', label: 'Best Recommendation' },
+  { id: 'ask', label: 'Ask AI' },
+  { id: 'history', label: 'History' },
 ]
 
 function ChangePassword() {
@@ -501,12 +664,14 @@ function Sidebar({ user, view, setView, onLogout }) {
                onClick={() => setView(it.id)}>{it.label}</div>)}
       {user.role === 'admin' && <>
         <div className="group-label">Admin</div>
-        <div className={'snav-item' + (view === 'admin' ? ' active' : '')} onClick={() => setView('admin')}>🛡️ All Users</div>
+        <div className={'snav-item' + (view === 'admin' ? ' active' : '')} onClick={() => setView('admin')}>All Users</div>
       </>}
     </nav>
     <div className="userbox">
-      <b>{user.email}</b><span className="role">{user.role}</span>
-      <button className="mini full" onClick={() => setPwOpen(!pwOpen)}>🔑 Change password</button>
+      <b>{user.display_name || user.email}</b>
+      {user.display_name && <div className="mut">{user.email}</div>}
+      <span className="role">{user.role}{user.auth_provider === 'google' ? ' · Google' : ''}</span>
+      {user.auth_provider !== 'google' && <button className="mini full" onClick={() => setPwOpen(!pwOpen)}>Change password</button>}
       {pwOpen && <ChangePassword />}
       <button className="mini full" onClick={onLogout}>Log out</button>
     </div>
@@ -519,6 +684,7 @@ function AuthGate({ onAuth }) {
   const [pw, setPw] = useState('')
   const [err, setErr] = useState('')
   const [busy, setBusy] = useState(false)
+
   async function submit(e) {
     e.preventDefault(); setErr(''); setBusy(true)
     try {
@@ -526,15 +692,68 @@ function AuthGate({ onAuth }) {
       setToken(d.token); onAuth(d.user)
     } catch (e) { setErr(e.message) } finally { setBusy(false) }
   }
+
+  async function googleLogin() {
+    setErr(''); setBusy(true)
+    try {
+      if (!window.google?.accounts?.id) {
+        setErr('Google Sign-In not loaded. Check GOOGLE_CLIENT_ID config.')
+        setBusy(false)
+        return
+      }
+      window.google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          setErr('Google popup was blocked or dismissed.')
+          setBusy(false)
+        }
+      })
+    } catch (e) { setErr(e.message); setBusy(false) }
+  }
+
+  useEffect(() => {
+    const script = document.createElement('script')
+    script.src = 'https://accounts.google.com/gsi/client'
+    script.async = true
+    script.onload = () => {
+      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+      if (!clientId || !window.google?.accounts?.id) return
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: async (response) => {
+          try {
+            const d = await apiPost('/auth/google', { id_token: response.credential }, { auth: false })
+            setToken(d.token); onAuth(d.user)
+          } catch (e) { setErr(e.message) }
+        }
+      })
+    }
+    document.head.appendChild(script)
+    return () => { try { document.head.removeChild(script) } catch {} }
+  }, [])
+
   return <div className="authwrap">
     <form className="auth-card" onSubmit={submit}>
-      <h1>📈 Trading-AI</h1>
+      <h1>Trading-AI</h1>
       <div className="sub">{signup ? 'Create your paper-trading account' : 'Sign in to your paper-trading account'}</div>
+
+      {import.meta.env.VITE_GOOGLE_CLIENT_ID && <>
+        <button type="button" className="google-btn" onClick={googleLogin} disabled={busy}>
+          <svg viewBox="0 0 24 24" width="18" height="18" style={{marginRight: 8}}>
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Continue with Google
+        </button>
+        <div className="auth-divider"><span>or</span></div>
+      </>}
+
       <label>Email</label>
       <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required />
       <label>Password</label>
       <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="••••••••" minLength={6} required />
-      <button className="primary" disabled={busy} >{busy ? '…' : (signup ? 'Sign up' : 'Log in')}</button>
+      <button className="primary" disabled={busy}>{busy ? '...' : (signup ? 'Sign up' : 'Log in')}</button>
       {err && <div className="auth-err">{err}</div>}
       <div className="auth-toggle">
         {signup ? 'Already have an account? ' : 'New here? '}
@@ -558,7 +777,7 @@ export default function App() {
 
   const logout = () => { setToken(null); setUser(null) }
 
-  if (booting) return <div className="authwrap"><div className="mut">Loading…</div></div>
+  if (booting) return <div className="authwrap"><div className="mut">Loading...</div></div>
   if (!user) return <AuthGate onAuth={(u) => { setUser(u); setView('dashboard') }} />
 
   return <div className="app">

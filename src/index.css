@@ -149,23 +149,53 @@ button.mini.full:hover { color: var(--txt); border-color: var(--acc); }
 .auth-toggle a { color: var(--acc); cursor: pointer; }
 
 /* mode toggle (ML / Custom) */
-.mode-toggle { margin-bottom: 16px; }
+.dual-mode { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+.mode-toggle { margin-bottom: 0; }
 .mode-label { font-size: 12px; text-transform: uppercase; letter-spacing: .04em;
   color: var(--mut); margin-bottom: 8px; }
 .mode-switch { display: flex; gap: 0; border: 1px solid var(--line); border-radius: 10px;
-  overflow: hidden; width: fit-content; }
-.mode-btn { background: var(--card); color: var(--mut); border: 0; padding: 10px 20px;
-  font-size: 14px; font-weight: 600; cursor: pointer; display: flex; flex-direction: column;
-  align-items: center; gap: 2px; min-width: 160px; }
+  overflow: hidden; width: 100%; }
+.mode-btn { background: var(--card); color: var(--mut); border: 0; padding: 10px 16px;
+  font-size: 13px; font-weight: 600; cursor: pointer; display: flex; flex-direction: column;
+  align-items: center; gap: 2px; flex: 1; }
 .mode-btn .mode-desc { font-size: 11px; font-weight: 400; }
 .mode-btn.active { background: var(--acc); color: #fff; }
 .mode-btn.ml.active { background: #7c3aed; }
 .mode-btn:not(.active):hover { color: var(--txt); background: #1a2333; }
-.mode-info { margin-top: 10px; font-size: 13px; color: var(--mut); line-height: 1.5;
-  padding: 10px 14px; background: rgba(124,58,237,.08); border: 1px solid rgba(124,58,237,.25);
+.mode-info { margin-top: 10px; font-size: 12.5px; color: var(--mut); line-height: 1.5;
+  padding: 9px 12px; background: rgba(124,58,237,.08); border: 1px solid rgba(124,58,237,.25);
   border-radius: 10px; }
 .ml-panel { border-left: 3px solid #7c3aed; }
 .ml-panel h3 { color: #a78bfa; }
+.auto-opened-feedback { grid-column: 1 / -1; }
+.auto-msg { padding: 8px 12px; border-radius: 8px; font-size: 13px; margin-top: 6px;
+  background: var(--card); border: 1px solid var(--line); }
+.auto-msg.ok { border-left: 3px solid var(--good); }
+.auto-msg.err { border-left: 3px solid var(--bad); color: var(--bad); }
+
+/* dual wallet layout */
+.wallet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.wallet-section { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+.wallet-header { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em;
+  margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.wallet-header.inr { color: #f59e0b; }
+.wallet-header.usd { color: #22c55e; }
+.wallet-section .cards { margin-top: 0; }
+
+/* google auth */
+.google-btn { width: 100%; background: #fff; color: #333; border: 1px solid #ddd; border-radius: 10px;
+  padding: 10px 18px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex;
+  align-items: center; justify-content: center; min-height: 40px; }
+.google-btn:hover { background: #f5f5f5; }
+.auth-divider { text-align: center; margin: 16px 0; position: relative; }
+.auth-divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0;
+  border-top: 1px solid var(--line); }
+.auth-divider span { background: var(--card); padding: 0 12px; position: relative; color: var(--mut); font-size: 13px; }
+
+@media (max-width: 640px) {
+  .dual-mode { grid-template-columns: 1fr; }
+  .wallet-grid { grid-template-columns: 1fr; }
+}
 
 @media (max-width: 640px) {
   .app { grid-template-columns: 1fr; }
