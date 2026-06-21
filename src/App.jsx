@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { apiGet, apiPost, getToken, setToken, setAuthFailHandler, API } from './api'
+import { apiGet, apiPost, apiDelete, getToken, setToken, setAuthFailHandler, API } from './api'
 import CandleChart from './CandleChart.jsx'
 
 const fmt = (n) => n == null ? '–' : '₹' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 })
@@ -74,58 +74,62 @@ function useLiveStream() {
 const Card = ({ k, v, cls }) =>
   <div className="c"><div className="k">{k}</div><div className={'v ' + (cls || '')}>{v}</div></div>
 
-function WalletPanel({ wallet, fxWallet, refresh }) {
+function WalletPanel({ wallet, refresh }) {
   const [dep, setDep] = useState('')
-  const [fxDep, setFxDep] = useState('')
   if (!wallet) return <div className="answer">Loading wallet...</div>
   const w = wallet
-  return <>
-    <div className="wallet-grid">
-      <div className="wallet-section">
-        <div className="wallet-header inr">Indian Market (INR)</div>
-        <div className="cards">
-          <Card k="Balance" v={fmt(w.balance)} />
-          <Card k="Realized P&L" v={fmt(w.realized_pnl)} />
-        </div>
-        <div className="box" style={{ marginTop: 10 }}>
-          <input type="number" placeholder="add paper funds (INR)" value={dep}
-                 onChange={(e) => setDep(e.target.value)} />
-          <button disabled={!dep} onClick={async () => {
-            const r = await apiPost('/me/wallet/deposit', { amount: Number(dep) })
-            if (r.error) alert(r.error)
-            setDep(''); refresh()
-          }}>Add</button>
-        </div>
-      </div>
-      {fxWallet && <div className="wallet-section">
-        <div className="wallet-header usd">Forex (USD)</div>
-        <div className="cards">
-          <Card k="Balance" v={fmtUsd(fxWallet.balance)} />
-          <Card k="Realized P&L" v={fmtUsd(fxWallet.realized_pnl)} />
-        </div>
-        <div className="box" style={{ marginTop: 10 }}>
-          <input type="number" placeholder="deposit USD (max $100k)" value={fxDep}
-                 onChange={(e) => setFxDep(e.target.value)} />
-          <button disabled={!fxDep} onClick={async () => {
-            const r = await apiPost('/me/forex-wallet/deposit', { amount: Number(fxDep) })
-            if (r.error) alert(r.error)
-            setFxDep(''); refresh()
-          }}>Add</button>
-        </div>
-      </div>}
+  return <div className="wallet-section">
+    <div className="wallet-header inr">Indian Market (INR)</div>
+    <div className="cards">
+      <Card k="Balance" v={fmt(w.balance)} />
+      <Card k="Realized P&L" v={fmt(w.realized_pnl)} />
     </div>
-  </>
+    <div className="box" style={{ marginTop: 10 }}>
+      <input type="number" placeholder="add paper funds (INR)" value={dep}
+             onChange={(e) => setDep(e.target.value)} />
+      <button disabled={!dep} onClick={async () => {
+        const r = await apiPost('/me/wallet/deposit', { amount: Number(dep) })
+        if (r.error) alert(r.error)
+        setDep(''); refresh()
+      }}>Add</button>
+    </div>
+  </div>
 }
 
-function LiveEquityBar({ data }) {
+function ForexWalletPanel({ wallet, refresh }) {
+  const [dep, setDep] = useState('')
+  if (!wallet) return <div className="answer">Loading forex wallet...</div>
+  return <div className="wallet-section">
+    <div className="wallet-header usd">Forex (USD)</div>
+    <div className="cards">
+      <Card k="Balance" v={fmtUsd(wallet.balance)} />
+      <Card k="Realized P&L" v={fmtUsd(wallet.realized_pnl)} />
+    </div>
+    <div className="box" style={{ marginTop: 10 }}>
+      <input type="number" placeholder="deposit USD (max $100k)" value={dep}
+             onChange={(e) => setDep(e.target.value)} />
+      <button disabled={!dep} onClick={async () => {
+        const r = await apiPost('/me/forex-wallet/deposit', { amount: Number(dep) })
+        if (r.error) alert(r.error)
+        setDep(''); refresh()
+      }}>Add</button>
+    </div>
+  </div>
+}
+
+function LiveEquityBar({ data, showForex }) {
   if (!data) return null
   const iCls = (data.unrealized || 0) >= 0 ? 'ok' : 'err'
-  const fCls = (data.forex_unrealized || 0) >= 0 ? 'ok' : 'err'
+  if (showForex) {
+    const fCls = (data.forex_unrealized || 0) >= 0 ? 'ok' : 'err'
+    return <div className="cards" style={{ marginTop: 12 }}>
+      <Card k="Forex Live Equity" v={fmtUsd(data.forex_live_equity)} cls={fCls} />
+      <Card k="Forex Unrealized" v={fmtUsd(data.forex_unrealized)} cls={fCls} />
+    </div>
+  }
   return <div className="cards" style={{ marginTop: 12 }}>
-    <Card k="Indian Live Equity" v={fmt(data.live_equity)} cls={iCls} />
-    <Card k="Indian Unrealized" v={fmt(data.unrealized)} cls={iCls} />
-    <Card k="Forex Live Equity" v={fmtUsd(data.forex_live_equity)} cls={fCls} />
-    <Card k="Forex Unrealized" v={fmtUsd(data.forex_unrealized)} cls={fCls} />
+    <Card k="Live Equity" v={fmt(data.live_equity)} cls={iCls} />
+    <Card k="Unrealized P&L" v={fmt(data.unrealized)} cls={iCls} />
   </div>
 }
 
@@ -221,11 +225,10 @@ function DualModeToggle({ indianMode, forexMode, onToggle, toggling, autoOpened 
 }
 
 // ── views ──
-function Dashboard() {
+function Dashboard({ tradingMode }) {
   const { data, refresh } = useWallet()
   const [reco, setReco] = useState(null)
   const [indianMode, setIndianMode] = useState('custom')
-  const [forexMode, setForexMode] = useState('custom')
   const [toggling, setToggling] = useState(false)
   const [autoOpened, setAutoOpened] = useState(null)
   const live = useLiveStream()
@@ -233,71 +236,80 @@ function Dashboard() {
   useEffect(() => { apiGet('/recommendation').then(setReco).catch((e) => setReco({ answer: e.message })) }, [])
   useEffect(() => {
     if (data?.indian_trade_mode) setIndianMode(data.indian_trade_mode)
-    if (data?.forex_trade_mode) setForexMode(data.forex_trade_mode)
   }, [data])
 
-  async function toggleMode(mode, market) {
-    setToggling(true)
-    setAutoOpened(null)
+  async function toggleMode(mode) {
+    setToggling(true); setAutoOpened(null)
     try {
-      const endpoint = market === 'forex' ? '/me/mode/forex' : '/me/mode/indian'
-      const r = await apiPost(endpoint, { mode })
+      const r = await apiPost('/me/mode/indian', { mode })
       if (r.auto_opened) setAutoOpened(r.auto_opened)
-      if (market === 'indian') setIndianMode(mode)
-      else setForexMode(mode)
-      refresh()
+      setIndianMode(mode); refresh()
     } catch (e) { alert(e.message) } finally { setToggling(false) }
   }
 
-  // Merge: use polled data for wallets/modes, overlay SSE live prices when available
   const merged = data ? { ...data } : null
   if (merged && live) {
     merged.live_equity = live.indian_equity ?? merged.live_equity
-    merged.forex_live_equity = live.forex_equity ?? merged.forex_live_equity
     if (live.trades?.length) {
-      const liveUnrealI = live.trades.filter(t => t.segment !== 'forex').reduce((s, t) => s + (t.gross_pnl || 0), 0)
-      const liveUnrealF = live.trades.filter(t => t.segment === 'forex').reduce((s, t) => s + (t.gross_pnl || 0), 0)
-      merged.unrealized = liveUnrealI
-      merged.forex_unrealized = liveUnrealF
+      merged.unrealized = live.trades.filter(t => t.segment !== 'forex').reduce((s, t) => s + (t.gross_pnl || 0), 0)
     }
   }
   const displayData = merged
   const indianTrades = displayData?.indian_open_trades || (displayData?.open_trades || []).filter(t => t.segment !== 'forex')
-  const forexTrades = displayData?.forex_open_trades || (displayData?.open_trades || []).filter(t => t.segment === 'forex')
 
   return <>
-    <h2>Dashboard</h2><div className="crumb">Your wallets, positions & ML auto-trading</div>
-    <DualModeToggle indianMode={indianMode} forexMode={forexMode}
-                    onToggle={toggleMode} toggling={toggling} autoOpened={autoOpened} />
+    <h2>Dashboard</h2>
+    <div className="crumb">Indian market · {tradingMode === 'live' ? 'Live trading' : 'Paper trading'}</div>
+
+    {tradingMode === 'live' && <div className="panel live-badge-panel">
+      <span className="live-dot" /> You are in <b>LIVE</b> trading mode. Real orders go to your broker.
+    </div>}
+
+    <div className="mode-toggle" style={{ marginBottom: 16 }}>
+      <div className="mode-label">ML Auto-Trading</div>
+      <div className="mode-switch">
+        <button className={'mode-btn' + (indianMode !== 'ml' ? ' active' : '')}
+                disabled={toggling} onClick={() => toggleMode('custom')}>
+          Custom <span className="mode-desc">Manual trading</span>
+        </button>
+        <button className={'mode-btn ml' + (indianMode === 'ml' ? ' active' : '')}
+                disabled={toggling} onClick={() => toggleMode('ml')}>
+          ML Auto <span className="mode-desc">System picks & manages</span>
+        </button>
+      </div>
+      {indianMode === 'ml' && <div className="mode-info">
+        Auto-trades Indian market during 9:15–15:15 IST. Picks best option/future, manages SL & target.
+      </div>}
+      {autoOpened && autoOpened.length > 0 && <div className="auto-opened-feedback">
+        {autoOpened.map((a, i) => <div key={i} className={'auto-msg ' + (a.error ? 'err' : a.trade ? 'ok' : '')}>
+          {a.trade ? `Opened ${a.symbol} (${a.trade.side})` :
+           a.error ? `Error: ${a.error}` : a.info || 'No trade available'}
+        </div>)}
+      </div>}
+    </div>
     {toggling && <div className="mut">Switching mode...</div>}
-    <WalletPanel wallet={displayData?.wallet || displayData?.indian_wallet}
-                 fxWallet={displayData?.forex_wallet} refresh={refresh} />
+
+    <WalletPanel wallet={displayData?.wallet || displayData?.indian_wallet} refresh={refresh} />
     <LiveEquityBar data={displayData} />
 
-    {(indianMode === 'ml' || forexMode === 'ml') &&
+    {indianMode === 'ml' &&
       <div className="panel ml-panel"><h3>ML Auto-Trading Active</h3>
         <div className="answer">
-          {indianMode === 'ml' && <div>Indian market: auto-managed during 9:15–15:15 IST</div>}
-          {forexMode === 'ml' && <div>Forex: auto-managed 24/5 via confluence engine</div>}
+          <div>Indian market: auto-managed during 9:15–15:15 IST</div>
           <div className="mut" style={{ marginTop: 6 }}>Background loop runs every 60s. Entries with SL + target, auto-exit on hit or square-off time.</div>
         </div>
       </div>}
 
-    {indianMode !== 'ml' && <div className="panel"><h3>Today's best idea (Indian)</h3>
+    {indianMode !== 'ml' && <div className="panel"><h3>Today's best idea</h3>
       {reco ? <div className="answer">{reco.answer}</div> : <div className="mut">Loading...</div>}
     </div>}
 
     <div className="panel">
-      <h3>Indian Positions ({indianTrades.length})</h3>
+      <h3>Open Positions ({indianTrades.length})</h3>
       <Positions trades={indianTrades} refresh={refresh} />
       {indianTrades.map(t => <PnlMiniChart key={t.id} series={t.pnl_series} fx={false} />)}
     </div>
-    <div className="panel">
-      <h3>Forex Positions ({forexTrades.length})</h3>
-      <Positions trades={forexTrades} refresh={refresh} fxMode />
-      {forexTrades.map(t => <PnlMiniChart key={t.id} series={t.pnl_series} fx={true} />)}
-    </div>
-    <div className="foot">Quantitative engines produce every number · the AI only summarizes · paper money only, no profit guarantee</div>
+    <div className="foot">Quantitative engines produce every number · the AI only summarizes</div>
   </>
 }
 
@@ -691,6 +703,224 @@ function AskView() {
   </>
 }
 
+// ── Forex Beta Dashboard ──
+function ForexBetaDashboard() {
+  const { data, refresh } = useWallet()
+  const [forexMode, setForexMode] = useState('custom')
+  const [toggling, setToggling] = useState(false)
+  const [autoOpened, setAutoOpened] = useState(null)
+  const live = useLiveStream()
+
+  useEffect(() => {
+    if (data?.forex_trade_mode) setForexMode(data.forex_trade_mode)
+  }, [data])
+
+  async function toggleMode(mode) {
+    setToggling(true); setAutoOpened(null)
+    try {
+      const r = await apiPost('/me/mode/forex', { mode })
+      if (r.auto_opened) setAutoOpened(r.auto_opened)
+      setForexMode(mode); refresh()
+    } catch (e) { alert(e.message) } finally { setToggling(false) }
+  }
+
+  const merged = data ? { ...data } : null
+  if (merged && live) {
+    merged.forex_live_equity = live.forex_equity ?? merged.forex_live_equity
+    if (live.trades?.length) {
+      merged.forex_unrealized = live.trades.filter(t => t.segment === 'forex').reduce((s, t) => s + (t.gross_pnl || 0), 0)
+    }
+  }
+  const forexTrades = merged?.forex_open_trades || (merged?.open_trades || []).filter(t => t.segment === 'forex')
+
+  return <>
+    <h2>Forex Dashboard <span className="beta-tag">BETA</span></h2>
+    <div className="crumb">Multi-timeframe confluence · 27 indicators · paper trading</div>
+
+    <div className="mode-toggle" style={{ marginBottom: 16 }}>
+      <div className="mode-label">Forex ML Mode</div>
+      <div className="mode-switch">
+        <button className={'mode-btn' + (forexMode !== 'ml' ? ' active' : '')}
+                disabled={toggling} onClick={() => toggleMode('custom')}>
+          Custom <span className="mode-desc">Manual trading</span>
+        </button>
+        <button className={'mode-btn ml' + (forexMode === 'ml' ? ' active' : '')}
+                disabled={toggling} onClick={() => toggleMode('ml')}>
+          ML Auto <span className="mode-desc">24/5 confluence engine</span>
+        </button>
+      </div>
+      {forexMode === 'ml' && <div className="mode-info">
+        Auto-trades forex 24/5 using multi-timeframe confluence (27 indicators). Manages SL & TP automatically.
+      </div>}
+      {autoOpened && autoOpened.length > 0 && <div className="auto-opened-feedback">
+        {autoOpened.map((a, i) => <div key={i} className={'auto-msg ' + (a.error ? 'err' : a.trade ? 'ok' : '')}>
+          {a.trade ? `Opened ${a.symbol} (${a.trade.side})` :
+           a.error ? `Error: ${a.error}` : a.info || 'No trade available'}
+        </div>)}
+      </div>}
+    </div>
+
+    <ForexWalletPanel wallet={merged?.forex_wallet} refresh={refresh} />
+    <LiveEquityBar data={merged} showForex />
+
+    <div className="panel">
+      <h3>Forex Positions ({forexTrades.length})</h3>
+      <Positions trades={forexTrades} refresh={refresh} fxMode />
+      {forexTrades.map(t => <PnlMiniChart key={t.id} series={t.pnl_series} fx={true} />)}
+    </div>
+    <div className="foot">Forex module is in beta · confluence engine under active development</div>
+  </>
+}
+
+// ── Settings: Trading Mode + Broker Config ──
+function SettingsView({ tradingMode, setTradingMode }) {
+  const [brokerCfg, setBrokerCfg] = useState(null)
+  const [saving, setSaving] = useState(false)
+  const [msg, setMsg] = useState('')
+  const [form, setForm] = useState({ api_key: '', client_id: '', password: '', totp_secret: '' })
+  const [showForm, setShowForm] = useState(false)
+  const [switching, setSwitching] = useState(false)
+
+  useEffect(() => {
+    apiGet('/me/broker-config').then(setBrokerCfg).catch(() => {})
+  }, [])
+
+  async function switchMode(mode) {
+    setSwitching(true); setMsg('')
+    try {
+      const r = await apiPost('/me/trading-mode', { mode })
+      setTradingMode(r.trading_mode)
+      setMsg(`Switched to ${r.trading_mode} mode`)
+    } catch (e) { setMsg(e.message) } finally { setSwitching(false) }
+  }
+
+  async function saveBroker() {
+    if (!form.api_key || !form.client_id || !form.password || !form.totp_secret) {
+      setMsg('All 4 fields are required'); return
+    }
+    setSaving(true); setMsg('')
+    try {
+      await apiPost('/me/broker-config', form)
+      setMsg('Broker configured successfully')
+      setShowForm(false)
+      setForm({ api_key: '', client_id: '', password: '', totp_secret: '' })
+      const cfg = await apiGet('/me/broker-config')
+      setBrokerCfg(cfg)
+    } catch (e) { setMsg(e.message) } finally { setSaving(false) }
+  }
+
+  async function removeBroker() {
+    if (!confirm('Remove broker config and switch to paper mode?')) return
+    setSaving(true); setMsg('')
+    try {
+      await apiDelete('/me/broker-config')
+      setBrokerCfg(null)
+      setTradingMode('paper')
+      setMsg('Broker config removed, switched to paper mode')
+      const cfg = await apiGet('/me/broker-config')
+      setBrokerCfg(cfg)
+    } catch (e) { setMsg(e.message) } finally { setSaving(false) }
+  }
+
+  const configured = brokerCfg?.configured
+
+  return <>
+    <h2>Settings</h2>
+    <div className="crumb">Trading mode & broker configuration</div>
+
+    {/* Trading Mode */}
+    <div className="panel">
+      <h3>Trading Mode</h3>
+      <div className="trading-mode-switch">
+        <button className={'tmode-btn' + (tradingMode === 'paper' ? ' active paper' : '')}
+                disabled={switching} onClick={() => switchMode('paper')}>
+          <span className="tmode-icon">📝</span>
+          <span className="tmode-title">Paper Trading</span>
+          <span className="tmode-desc">Simulated trades with virtual money. No real orders.</span>
+        </button>
+        <button className={'tmode-btn' + (tradingMode === 'live' ? ' active live' : '')}
+                disabled={switching || !configured}
+                onClick={() => switchMode('live')}>
+          <span className="tmode-icon">⚡</span>
+          <span className="tmode-title">Live Trading</span>
+          <span className="tmode-desc">{configured
+            ? 'Real orders sent to your broker account.'
+            : 'Configure your broker below to enable.'}</span>
+        </button>
+      </div>
+      {!configured && tradingMode === 'paper' &&
+        <div className="mut" style={{ marginTop: 10, fontSize: 13 }}>
+          Set up your Angel One broker account below to unlock live trading.
+        </div>}
+    </div>
+
+    {/* Broker Config */}
+    <div className="panel">
+      <h3>Broker Account — Angel One</h3>
+      {brokerCfg === null ? <div className="mut">Loading...</div> : <>
+        {configured ? <div className="broker-status configured">
+          <div className="broker-check">Configured</div>
+          <div className="broker-detail">
+            Client ID: {brokerCfg.client_id_display || '***'} ·
+            API Key: {brokerCfg.has_api_key ? 'Set' : 'Missing'} ·
+            TOTP: {brokerCfg.has_totp ? 'Set' : 'Missing'}
+          </div>
+          {brokerCfg.updated_at && <div className="mut">Last updated: {new Date(brokerCfg.updated_at).toLocaleDateString()}</div>}
+          <div className="row" style={{ marginTop: 12, gap: 8 }}>
+            <button className="mini" onClick={() => setShowForm(!showForm)}>
+              {showForm ? 'Cancel' : 'Update Credentials'}
+            </button>
+            <button className="mini" style={{ color: 'var(--bad)' }} onClick={removeBroker} disabled={saving}>
+              Remove
+            </button>
+          </div>
+        </div> : <div className="broker-status not-configured">
+          <div className="broker-check missing">Not Configured</div>
+          <div className="mut" style={{ marginTop: 6 }}>
+            Connect your Angel One demat account to enable live trading.
+          </div>
+          <button className="mini" style={{ marginTop: 10 }} onClick={() => setShowForm(true)}>
+            Set Up Broker
+          </button>
+        </div>}
+
+        {(showForm || !configured) && showForm !== false && <div className="broker-form">
+          <div className="broker-form-note">
+            Your credentials are stored securely and used only to place orders on your behalf.
+            You can find these in your Angel One SmartAPI dashboard.
+          </div>
+          <label>API Key</label>
+          <input type="text" value={form.api_key} placeholder="Your SmartAPI key"
+                 onChange={e => setForm({ ...form, api_key: e.target.value })} />
+          <label>Client ID</label>
+          <input type="text" value={form.client_id} placeholder="e.g. D12345"
+                 onChange={e => setForm({ ...form, client_id: e.target.value })} />
+          <label>Password</label>
+          <input type="password" value={form.password} placeholder="Your trading password"
+                 onChange={e => setForm({ ...form, password: e.target.value })} />
+          <label>TOTP Secret</label>
+          <input type="text" value={form.totp_secret} placeholder="Base32 TOTP key from SmartAPI"
+                 onChange={e => setForm({ ...form, totp_secret: e.target.value })} />
+          <button onClick={saveBroker} disabled={saving} style={{ marginTop: 12 }}>
+            {saving ? 'Saving...' : 'Save Broker Config'}
+          </button>
+        </div>}
+      </>}
+    </div>
+
+    {msg && <div className="panel"><div className={msg.includes('Error') || msg.includes('required') ? 'answer err' : 'answer'}>{msg}</div></div>}
+
+    <div className="panel">
+      <h3>About Trading Modes</h3>
+      <div className="answer" style={{ fontSize: 13 }}>
+        <b>Paper mode</b> — All trades are simulated with virtual capital. Prices are real (live market data), but no actual orders are placed. Use this to test strategies risk-free.<br /><br />
+        <b>Live mode</b> — Orders are routed to your Angel One broker account. Real money is at stake. A kill switch is available in admin panel to halt all orders instantly.<br /><br />
+        Your trading mode preference is saved and persists across sessions.
+      </div>
+    </div>
+  </>
+}
+
 // ── sidebar / shell / auth ──
 const NAV = [
   { id: 'dashboard', label: 'Dashboard' },
@@ -699,12 +929,14 @@ const NAV = [
   { id: 'opt-BANKNIFTY', label: 'Options · BANKNIFTY', sub: true },
   { id: 'futures', label: 'Futures' },
   { id: 'equity', label: 'Intraday Equity' },
-  { group: 'Forex' },
-  { id: 'forex', label: 'Forex Trading' },
+  { group: 'Forex (Beta)' },
+  { id: 'forex-dashboard', label: 'Forex Dashboard', sub: false },
+  { id: 'forex', label: 'Trade Forex', sub: true },
   { group: 'Tools' },
   { id: 'reco', label: 'Best Recommendation' },
   { id: 'ask', label: 'Ask AI' },
   { id: 'history', label: 'History' },
+  { id: 'settings', label: 'Settings' },
 ]
 
 function ChangePassword() {
@@ -724,10 +956,14 @@ function ChangePassword() {
   </div>
 }
 
-function Sidebar({ user, view, setView, onLogout }) {
+function Sidebar({ user, view, setView, onLogout, tradingMode }) {
   const [pwOpen, setPwOpen] = useState(false)
   return <aside className="sidebar">
-    <div className="brand">Trading-AI<small>paper trading · not financial advice</small></div>
+    <div className="brand">Trading-AI
+      <small>{tradingMode === 'live'
+        ? <span className="live-indicator"><span className="live-dot" /> live trading</span>
+        : 'paper trading'} · not financial advice</small>
+    </div>
     <nav className="snav">
       {NAV.map((it, i) => it.group
         ? <div className="group-label" key={'g' + i}>{it.group}</div>
@@ -843,31 +1079,43 @@ export default function App() {
   const [user, setUser] = useState(null)
   const [view, setView] = useState('dashboard')
   const [booting, setBooting] = useState(true)
+  const [tradingMode, setTradingMode] = useState('paper')
 
   useEffect(() => {
     setAuthFailHandler(() => setUser(null))
     if (getToken()) {
-      apiGet('/auth/me').then(setUser).catch(() => setToken(null)).finally(() => setBooting(false))
+      Promise.all([
+        apiGet('/auth/me').catch(() => { setToken(null); return null }),
+        apiGet('/me/trading-mode').catch(() => ({ trading_mode: 'paper' })),
+      ]).then(([u, tm]) => {
+        if (u) setUser(u)
+        if (tm) setTradingMode(tm.trading_mode || 'paper')
+      }).finally(() => setBooting(false))
     } else setBooting(false)
   }, [])
 
   const logout = () => { setToken(null); setUser(null) }
 
   if (booting) return <div className="authwrap"><div className="mut">Loading...</div></div>
-  if (!user) return <AuthGate onAuth={(u) => { setUser(u); setView('dashboard') }} />
+  if (!user) return <AuthGate onAuth={(u) => {
+    setUser(u); setView('dashboard')
+    apiGet('/me/trading-mode').then(r => setTradingMode(r.trading_mode || 'paper')).catch(() => {})
+  }} />
 
   return <div className="app">
-    <Sidebar user={user} view={view} setView={setView} onLogout={logout} />
+    <Sidebar user={user} view={view} setView={setView} onLogout={logout} tradingMode={tradingMode} />
     <main className="main">
-      {view === 'dashboard' && <Dashboard />}
+      {view === 'dashboard' && <Dashboard tradingMode={tradingMode} />}
       {view === 'opt-NIFTY' && <OptionsView sym="NIFTY" key="optn" />}
       {view === 'opt-BANKNIFTY' && <OptionsView sym="BANKNIFTY" key="optb" />}
       {view === 'futures' && <FuturesView />}
       {view === 'equity' && <EquityView />}
+      {view === 'forex-dashboard' && <ForexBetaDashboard />}
       {view === 'forex' && <ForexView />}
       {view === 'reco' && <RecoView />}
       {view === 'ask' && <AskView />}
       {view === 'history' && <HistoryView />}
+      {view === 'settings' && <SettingsView tradingMode={tradingMode} setTradingMode={setTradingMode} />}
       {view === 'admin' && <AdminView user={user} />}
     </main>
   </div>

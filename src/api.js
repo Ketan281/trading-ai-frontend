@@ -35,3 +35,4 @@ async function req(path, { method = 'GET', body, auth = true } = {}) {
 
 export const apiGet = (path, opts) => req(path, { ...opts })
 export const apiPost = (path, body, opts) => req(path, { method: 'POST', body, ...opts })
+export const apiDelete = (path, opts) => req(path, { method: 'DELETE', ...opts })
