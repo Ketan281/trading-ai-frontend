@@ -224,16 +224,190 @@ function DualModeToggle({ indianMode, forexMode, onToggle, toggling, autoOpened 
   </div>
 }
 
+// ── Segment Recommendation Card ──
+function SegCard({ pick, segment, label }) {
+  if (!pick) return <div className="seg-card">
+    <div className="seg-card-head"><span className={`seg-label ${segment}`}>{label}</span></div>
+    <div className="seg-no-pick">No recommendation right now</div>
+  </div>
+  const confCls = pick.confidence >= 70 ? 'high' : pick.confidence >= 45 ? 'mid' : 'low'
+  return <div className="seg-card">
+    <div className="seg-card-head">
+      <span className={`seg-label ${segment}`}>{label}</span>
+      <div className="seg-conf">
+        <div className={`seg-conf-val ${confCls}`}>{pick.confidence}%</div>
+        <div className="seg-conf-label">confidence</div>
+      </div>
+    </div>
+    <div className="seg-symbol">{pick.symbol}</div>
+    <span className={`seg-action ${pick.action}`}>{pick.action}</span>
+    <div className="seg-meta">
+      <span>Entry <b>{fmt(pick.entry)}</b></span>
+      <span>SL <b>{fmt(pick.stop)}</b></span>
+      <span>TGT <b>{fmt(pick.target)}</b></span>
+      <span>R:R <b>{pick.reward_risk}:1</b></span>
+      {pick.grade && <span>Grade <b>{pick.grade}</b></span>}
+    </div>
+    <div className="seg-reason">{pick.reason}</div>
+  </div>
+}
+
+// ── Capital Allocation Bar ──
+function AllocationBar({ allocation, balance }) {
+  if (!allocation) return null
+  const segs = ['equity_intraday', 'options', 'swing']
+  const labels = { equity_intraday: 'Equity', options: 'Options', swing: 'Swing' }
+  const active = segs.filter(s => allocation[s]?.allocation_pct > 0)
+  if (!active.length) return <div className="mut" style={{ marginTop: 10 }}>No allocations — no confident picks available.</div>
+  return <>
+    <div className="alloc-bar">
+      {active.map(s => <div key={s} className={`alloc-seg ${s}`}
+        style={{ flex: allocation[s].allocation_pct }}>
+        {allocation[s].allocation_pct >= 10 ? `${allocation[s].allocation_pct}%` : ''}
+      </div>)}
+    </div>
+    <div className="alloc-legend">
+      {active.map(s => <span key={s}>
+        <span className={`alloc-dot ${s}`} />
+        {labels[s]}: {fmt(allocation[s].amount)} ({allocation[s].allocation_pct}%)
+      </span>)}
+    </div>
+  </>
+}
+
+// ── Recommendations Tab (refreshable) ──
+function RecommendationsView() {
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [countdown, setCountdown] = useState(0)
+  const [allocation, setAllocation] = useState(null)
+  const [allocBalance, setAllocBalance] = useState(0)
+  const [segFilter, setSegFilter] = useState('all')
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    try {
+      const [reco, alloc] = await Promise.all([
+        apiGet('/recommendations'),
+        apiGet('/recommendations/allocate'),
+      ])
+      setData(reco)
+      setAllocation(alloc.allocation)
+      setAllocBalance(alloc.balance)
+    } catch {} finally { setLoading(false); setCountdown(1800) }
+  }, [])
+
+  useEffect(() => { load() }, [load])
+
+  useEffect(() => {
+    if (countdown <= 0) return
+    const t = setInterval(() => setCountdown(c => {
+      if (c <= 1) { load(); return 0 }
+      return c - 1
+    }), 1000)
+    return () => clearInterval(t)
+  }, [countdown > 0])
+
+  const fmtTime = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
+
+  const allPicks = data ? [
+    ...(data.equity_intraday || []).map((p, i) => ({ ...p, _rank: i + 1 })),
+    ...(data.options || []).map((p, i) => ({ ...p, _rank: i + 1 })),
+    ...(data.swing || []).map((p, i) => ({ ...p, _rank: i + 1 })),
+  ].sort((a, b) => b.confidence - a.confidence) : []
+
+  const filtered = segFilter === 'all' ? allPicks : allPicks.filter(p => p.segment === segFilter)
+  const segLabels = { equity_intraday: 'Equity Intraday', options: 'Options', swing: 'Swing' }
+
+  return <>
+    <h2>Recommendations</h2>
+    <div className="crumb">
+      Confidence-sorted picks across all segments
+      <span className="countdown"> · auto-refresh in {fmtTime(countdown)}</span>
+    </div>
+
+    <div className="row" style={{ marginBottom: 12, gap: 8 }}>
+      <button className={`refresh-btn`} onClick={load} disabled={loading}>
+        {loading ? <><span className="refresh-spin">↻</span> Scanning...</> : '↻ Refresh Now'}
+      </button>
+      <select value={segFilter} onChange={e => setSegFilter(e.target.value)} style={{ fontSize: 13 }}>
+        <option value="all">All Segments</option>
+        <option value="equity_intraday">Equity Intraday</option>
+        <option value="options">Options</option>
+        <option value="swing">Swing</option>
+      </select>
+      {data?.timestamp && <span className="mut" style={{ fontSize: 11, marginLeft: 'auto' }}>
+        Last scan: {data.timestamp}
+      </span>}
+    </div>
+
+    {/* Capital Allocation */}
+    <div className="panel">
+      <h3>Capital Allocation (Custom Mode)</h3>
+      <div className="mut" style={{ fontSize: 12, marginBottom: 6 }}>
+        Budget {fmt(allocBalance)} divided by confidence across segments
+      </div>
+      <AllocationBar allocation={allocation} balance={allocBalance} />
+    </div>
+
+    {/* Best per segment */}
+    <div className="panel">
+      <h3>Best Pick Per Segment</h3>
+      <div className="seg-cards">
+        <SegCard pick={data?.best_per_segment?.equity_intraday} segment="equity_intraday" label="Intraday Equity" />
+        <SegCard pick={data?.best_per_segment?.options} segment="options" label="Options" />
+        <SegCard pick={data?.best_per_segment?.swing} segment="swing" label="Swing" />
+      </div>
+    </div>
+
+    {/* Full sorted list */}
+    <div className="panel">
+      <h3>All Recommendations ({filtered.length})</h3>
+      {loading && !data && <div className="mut">Scanning markets...</div>}
+      {filtered.length === 0 && !loading && <div className="mut" style={{ padding: 16 }}>No picks match the current filter.</div>}
+      <div className="reco-list">
+        {filtered.map((p, i) => {
+          const confCls = p.confidence >= 70 ? 'high' : p.confidence >= 45 ? 'mid' : 'low'
+          return <div key={`${p.segment}-${p.symbol}-${i}`} className="reco-item">
+            <div className="reco-rank">{i + 1}</div>
+            <div className="reco-body">
+              <b>{p.symbol}</b>{' '}
+              <span className={`seg-label ${p.segment}`}>{segLabels[p.segment] || p.segment}</span>{' '}
+              <span className={`seg-action ${p.action}`}>{p.action}</span>
+              <div className="seg-meta">
+                <span>Entry <b>{fmt(p.entry)}</b></span>
+                <span>SL <b>{fmt(p.stop)}</b></span>
+                <span>TGT <b>{fmt(p.target)}</b></span>
+                <span>R:R <b>{p.reward_risk}:1</b></span>
+                {p.grade && <span>Grade <b>{p.grade}</b></span>}
+              </div>
+            </div>
+            <div className="reco-right">
+              <div className={`seg-conf-val ${confCls}`}>{p.confidence}%</div>
+              <div className="seg-conf-label">confidence</div>
+            </div>
+          </div>
+        })}
+      </div>
+    </div>
+  </>
+}
+
 // ── views ──
 function Dashboard({ tradingMode }) {
   const { data, refresh } = useWallet()
   const [reco, setReco] = useState(null)
+  const [segReco, setSegReco] = useState(null)
+  const [segLoading, setSegLoading] = useState(true)
   const [indianMode, setIndianMode] = useState('custom')
   const [toggling, setToggling] = useState(false)
   const [autoOpened, setAutoOpened] = useState(null)
   const live = useLiveStream()
 
   useEffect(() => { apiGet('/recommendation').then(setReco).catch((e) => setReco({ answer: e.message })) }, [])
+  useEffect(() => {
+    apiGet('/recommendations').then(setSegReco).catch(() => {}).finally(() => setSegLoading(false))
+  }, [])
   useEffect(() => {
     if (data?.indian_trade_mode) setIndianMode(data.indian_trade_mode)
   }, [data])
@@ -291,6 +465,17 @@ function Dashboard({ tradingMode }) {
 
     <WalletPanel wallet={displayData?.wallet || displayData?.indian_wallet} refresh={refresh} />
     <LiveEquityBar data={displayData} />
+
+    {/* Per-segment best recommendations */}
+    <div className="panel">
+      <h3>Best Picks by Segment</h3>
+      {segLoading ? <div className="mut">Scanning sectors...</div> :
+        <div className="seg-cards">
+          <SegCard pick={segReco?.best_per_segment?.equity_intraday} segment="equity_intraday" label="Intraday Equity" />
+          <SegCard pick={segReco?.best_per_segment?.options} segment="options" label="Options" />
+          <SegCard pick={segReco?.best_per_segment?.swing} segment="swing" label="Swing" />
+        </div>}
+    </div>
 
     {indianMode === 'ml' &&
       <div className="panel ml-panel"><h3>ML Auto-Trading Active</h3>
@@ -925,9 +1110,10 @@ function SettingsView({ tradingMode, setTradingMode }) {
 const NAV = [
   { id: 'dashboard', label: 'Dashboard' },
   { group: 'Indian Market' },
+  { id: 'recommendations', label: 'Recommendations' },
   { id: 'opt-NIFTY', label: 'Options · NIFTY', sub: true },
   { id: 'opt-BANKNIFTY', label: 'Options · BANKNIFTY', sub: true },
-  { id: 'futures', label: 'Futures' },
+  { id: 'futures', label: 'Futures (Beta)', sub: true },
   { id: 'equity', label: 'Intraday Equity' },
   { group: 'Forex (Beta)' },
   { id: 'forex-dashboard', label: 'Forex Dashboard', sub: false },
@@ -1106,6 +1292,7 @@ export default function App() {
     <Sidebar user={user} view={view} setView={setView} onLogout={logout} tradingMode={tradingMode} />
     <main className="main">
       {view === 'dashboard' && <Dashboard tradingMode={tradingMode} />}
+      {view === 'recommendations' && <RecommendationsView />}
       {view === 'opt-NIFTY' && <OptionsView sym="NIFTY" key="optn" />}
       {view === 'opt-BANKNIFTY' && <OptionsView sym="BANKNIFTY" key="optb" />}
       {view === 'futures' && <FuturesView />}

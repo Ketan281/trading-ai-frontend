@@ -1,16 +1,16 @@
-# Graph Report - trading-ai-frontend  (2026-06-19)
+# Graph Report - trading-ai-frontend  (2026-06-22)
 
 ## Corpus Check
-- 8 files · ~5,507 words
+- 9 files · ~6,923 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 30 nodes · 48 edges · 4 communities (2 shown, 2 thin omitted)
+- 43 nodes · 104 edges · 6 communities (5 shown, 1 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1af3d22f`
+- Built from commit: `f0b28efa`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -19,53 +19,71 @@
 - [[_COMMUNITY_Community 1|Community 1]]
 - [[_COMMUNITY_Community 2|Community 2]]
 - [[_COMMUNITY_Community 3|Community 3]]
+- [[_COMMUNITY_Community 4|Community 4]]
+- [[_COMMUNITY_Community 5|Community 5]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `useWallet()` - 7 edges
-2. `fmt()` - 5 edges
-3. `fmtUsd()` - 5 edges
-4. `useCandles()` - 5 edges
-5. `WalletPanel()` - 3 edges
-6. `LiveEquityBar()` - 3 edges
-7. `PnlMiniChart()` - 3 edges
-8. `Dashboard()` - 3 edges
-9. `OptionsView()` - 3 edges
-10. `FuturesView()` - 3 edges
+1. `apiPost()` - 19 edges
+2. `apiGet()` - 12 edges
+3. `useWallet()` - 9 edges
+4. `req()` - 7 edges
+5. `fmtUsd()` - 6 edges
+6. `useCandles()` - 6 edges
+7. `fmt()` - 5 edges
+8. `Dashboard()` - 5 edges
+9. `EquityView()` - 5 edges
+10. `ForexView()` - 5 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `Dashboard()` --calls--> `useWallet()`  [EXTRACTED]
-  src/App.jsx → src/App.jsx  _Bridges community 1 → community 3_
-- `ForexView()` --calls--> `useWallet()`  [EXTRACTED]
-  src/App.jsx → src/App.jsx  _Bridges community 1 → community 2_
+- `useLiveStream()` --calls--> `getToken()`  [EXTRACTED]
+  src/App.jsx → src/api.js
+- `WalletPanel()` --calls--> `apiPost()`  [EXTRACTED]
+  src/App.jsx → src/api.js
+- `ForexWalletPanel()` --calls--> `apiPost()`  [EXTRACTED]
+  src/App.jsx → src/api.js
+- `Positions()` --calls--> `apiPost()`  [EXTRACTED]
+  src/App.jsx → src/api.js
+- `Dashboard()` --calls--> `apiGet()`  [EXTRACTED]
+  src/App.jsx → src/api.js
 
 ## Import Cycles
 - None detected.
 
-## Communities (4 total, 2 thin omitted)
+## Communities (6 total, 1 thin omitted)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.53
-Nodes (6): EquityView(), FuturesView(), OptionsView(), RecoView(), useCandles(), useWallet()
+Cohesion: 0.33
+Nodes (10): apiGet(), AdminView(), EquityView(), FuturesView(), HistoryView(), OptionsView(), RecoView(), SettingsView() (+2 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.38
-Nodes (7): fmt(), fmtUsd(), ForexView(), HistRow(), LiveEquityBar(), PnlMiniChart(), WalletPanel()
+Cohesion: 0.50
+Nodes (4): fmt(), HistRow(), PnlMiniChart(), WalletPanel()
+
+### Community 3 - "Community 3"
+Cohesion: 0.29
+Nodes (8): apiPost(), AskView(), AuthGate(), ChangePassword(), Dashboard(), ForexBetaDashboard(), Positions(), useLiveStream()
+
+### Community 4 - "Community 4"
+Cohesion: 0.39
+Nodes (7): apiDelete(), getToken(), isLocal, _onAuthFail(), req(), setAuthFailHandler(), setToken()
+
+### Community 5 - "Community 5"
+Cohesion: 0.50
+Nodes (4): fmtUsd(), ForexView(), ForexWalletPanel(), LiveEquityBar()
 
 ## Knowledge Gaps
-- **1 isolated node(s):** `NAV`
+- **2 isolated node(s):** `NAV`, `isLocal`
   These have ≤1 connection - possible missing edges or undocumented components.
-- **2 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **1 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `useWallet()` connect `Community 1` to `Community 0`, `Community 2`, `Community 3`?**
-  _High betweenness centrality (0.016) - this node is a cross-community bridge._
-- **Why does `fmt()` connect `Community 2` to `Community 0`?**
-  _High betweenness centrality (0.006) - this node is a cross-community bridge._
-- **Why does `fmtUsd()` connect `Community 2` to `Community 0`?**
-  _High betweenness centrality (0.006) - this node is a cross-community bridge._
-- **What connects `NAV` to the rest of the system?**
-  _1 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.13333333333333333 - nodes in this community are weakly interconnected._
+- **Why does `apiPost()` connect `Community 3` to `Community 0`, `Community 1`, `Community 2`, `Community 4`, `Community 5`?**
+  _High betweenness centrality (0.105) - this node is a cross-community bridge._
+- **Why does `apiGet()` connect `Community 1` to `Community 0`, `Community 3`, `Community 4`, `Community 5`?**
+  _High betweenness centrality (0.036) - this node is a cross-community bridge._
+- **Why does `req()` connect `Community 4` to `Community 1`, `Community 3`?**
+  _High betweenness centrality (0.015) - this node is a cross-community bridge._
+- **What connects `NAV`, `isLocal` to the rest of the system?**
+  _2 weakly-connected nodes found - possible documentation gaps or missing edges._
