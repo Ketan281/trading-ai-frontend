@@ -100,7 +100,7 @@
       "source_location": "L77",
       "_origin": "ast",
       "id": "src_app_walletpanel",
-      "community": 2,
+      "community": 5,
       "norm_label": "walletpanel()"
     },
     {
@@ -154,10 +154,40 @@
       "norm_label": "dualmodetoggle()"
     },
     {
-      "label": "Dashboard()",
+      "label": "SegCard()",
       "file_type": "code",
       "source_file": "src/App.jsx",
       "source_location": "L228",
+      "_origin": "ast",
+      "id": "src_app_segcard",
+      "community": 2,
+      "norm_label": "segcard()"
+    },
+    {
+      "label": "AllocationBar()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L256",
+      "_origin": "ast",
+      "id": "src_app_allocationbar",
+      "community": 0,
+      "norm_label": "allocationbar()"
+    },
+    {
+      "label": "RecommendationsView()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L279",
+      "_origin": "ast",
+      "id": "src_app_recommendationsview",
+      "community": 2,
+      "norm_label": "recommendationsview()"
+    },
+    {
+      "label": "Dashboard()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L397",
       "_origin": "ast",
       "id": "src_app_dashboard",
       "community": 3,
@@ -167,7 +197,7 @@
       "label": "TradeButtons()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L316",
+      "source_location": "L501",
       "_origin": "ast",
       "id": "src_app_tradebuttons",
       "community": 0,
@@ -177,7 +207,7 @@
       "label": "OptionsView()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L318",
+      "source_location": "L503",
       "_origin": "ast",
       "id": "src_app_optionsview",
       "community": 1,
@@ -187,7 +217,7 @@
       "label": "FuturesView()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L347",
+      "source_location": "L532",
       "_origin": "ast",
       "id": "src_app_futuresview",
       "community": 1,
@@ -197,7 +227,7 @@
       "label": "EquityView()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L378",
+      "source_location": "L563",
       "_origin": "ast",
       "id": "src_app_equityview",
       "community": 1,
@@ -207,7 +237,7 @@
       "label": "ForexView()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L449",
+      "source_location": "L634",
       "_origin": "ast",
       "id": "src_app_forexview",
       "community": 5,
@@ -217,7 +247,7 @@
       "label": "RecoView()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L558",
+      "source_location": "L743",
       "_origin": "ast",
       "id": "src_app_recoview",
       "community": 1,
@@ -227,7 +257,7 @@
       "label": "HistRow()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L588",
+      "source_location": "L773",
       "_origin": "ast",
       "id": "src_app_histrow",
       "community": 2,
@@ -237,7 +267,7 @@
       "label": "HistoryView()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L614",
+      "source_location": "L799",
       "_origin": "ast",
       "id": "src_app_historyview",
       "community": 1,
@@ -247,7 +277,7 @@
       "label": "AdminView()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L640",
+      "source_location": "L825",
       "_origin": "ast",
       "id": "src_app_adminview",
       "community": 1,
@@ -257,7 +287,7 @@
       "label": "AskView()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L678",
+      "source_location": "L863",
       "_origin": "ast",
       "id": "src_app_askview",
       "community": 3,
@@ -267,7 +297,7 @@
       "label": "ForexBetaDashboard()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L707",
+      "source_location": "L892",
       "_origin": "ast",
       "id": "src_app_forexbetadashboard",
       "community": 3,
@@ -277,7 +307,7 @@
       "label": "SettingsView()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L776",
+      "source_location": "L961",
       "_origin": "ast",
       "id": "src_app_settingsview",
       "community": 1,
@@ -287,7 +317,7 @@
       "label": "NAV",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L925",
+      "source_location": "L1110",
       "_origin": "ast",
       "id": "src_app_nav",
       "community": 0,
@@ -297,7 +327,7 @@
       "label": "ChangePassword()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L942",
+      "source_location": "L1128",
       "_origin": "ast",
       "id": "src_app_changepassword",
       "community": 3,
@@ -307,7 +337,7 @@
       "label": "Sidebar()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L959",
+      "source_location": "L1145",
       "_origin": "ast",
       "id": "src_app_sidebar",
       "community": 0,
@@ -317,7 +347,7 @@
       "label": "AuthGate()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L988",
+      "source_location": "L1174",
       "_origin": "ast",
       "id": "src_app_authgate",
       "community": 3,
@@ -327,7 +357,7 @@
       "label": "App()",
       "file_type": "code",
       "source_file": "src/App.jsx",
-      "source_location": "L1078",
+      "source_location": "L1264",
       "_origin": "ast",
       "id": "src_app_app",
       "community": 0,
@@ -339,9 +369,9 @@
       "source_file": "src/api.js",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "src_api",
       "community": 4,
-      "norm_label": "api.js"
+      "norm_label": "api.js",
+      "id": "src_api"
     },
     {
       "label": "isLocal",
@@ -349,9 +379,9 @@
       "source_file": "src/api.js",
       "source_location": "L5",
       "_origin": "ast",
-      "id": "src_api_islocal",
       "community": 4,
-      "norm_label": "islocal"
+      "norm_label": "islocal",
+      "id": "src_api_islocal"
     },
     {
       "label": "getToken()",
@@ -359,9 +389,9 @@
       "source_file": "src/api.js",
       "source_location": "L12",
       "_origin": "ast",
-      "id": "src_api_gettoken",
       "community": 4,
-      "norm_label": "gettoken()"
+      "norm_label": "gettoken()",
+      "id": "src_api_gettoken"
     },
     {
       "label": "setToken()",
@@ -369,9 +399,9 @@
       "source_file": "src/api.js",
       "source_location": "L13",
       "_origin": "ast",
-      "id": "src_api_settoken",
       "community": 4,
-      "norm_label": "settoken()"
+      "norm_label": "settoken()",
+      "id": "src_api_settoken"
     },
     {
       "label": "_onAuthFail()",
@@ -379,9 +409,9 @@
       "source_file": "src/api.js",
       "source_location": "L17",
       "_origin": "ast",
-      "id": "src_api_onauthfail",
       "community": 4,
-      "norm_label": "_onauthfail()"
+      "norm_label": "_onauthfail()",
+      "id": "src_api_onauthfail"
     },
     {
       "label": "setAuthFailHandler()",
@@ -389,9 +419,9 @@
       "source_file": "src/api.js",
       "source_location": "L18",
       "_origin": "ast",
-      "id": "src_api_setauthfailhandler",
       "community": 4,
-      "norm_label": "setauthfailhandler()"
+      "norm_label": "setauthfailhandler()",
+      "id": "src_api_setauthfailhandler"
     },
     {
       "label": "req()",
@@ -399,9 +429,9 @@
       "source_file": "src/api.js",
       "source_location": "L20",
       "_origin": "ast",
-      "id": "src_api_req",
       "community": 4,
-      "norm_label": "req()"
+      "norm_label": "req()",
+      "id": "src_api_req"
     },
     {
       "label": "apiGet()",
@@ -409,9 +439,9 @@
       "source_file": "src/api.js",
       "source_location": "L36",
       "_origin": "ast",
-      "id": "src_api_apiget",
       "community": 1,
-      "norm_label": "apiget()"
+      "norm_label": "apiget()",
+      "id": "src_api_apiget"
     },
     {
       "label": "apiPost()",
@@ -419,9 +449,9 @@
       "source_file": "src/api.js",
       "source_location": "L37",
       "_origin": "ast",
-      "id": "src_api_apipost",
       "community": 3,
-      "norm_label": "apipost()"
+      "norm_label": "apipost()",
+      "id": "src_api_apipost"
     },
     {
       "label": "apiDelete()",
@@ -429,9 +459,9 @@
       "source_file": "src/api.js",
       "source_location": "L38",
       "_origin": "ast",
-      "id": "src_api_apidelete",
       "community": 4,
-      "norm_label": "apidelete()"
+      "norm_label": "apidelete()",
+      "id": "src_api_apidelete"
     }
   ],
   "links": [
@@ -442,9 +472,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_api",
-      "confidence_score": 1.0
+      "target": "src_api"
     },
     {
       "relation": "imports",
@@ -453,9 +483,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_api_apidelete",
-      "confidence_score": 1.0
+      "target": "src_api_apidelete"
     },
     {
       "relation": "imports",
@@ -464,9 +494,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_api_apiget",
-      "confidence_score": 1.0
+      "target": "src_api_apiget"
     },
     {
       "relation": "imports",
@@ -475,9 +505,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_api_apipost",
-      "confidence_score": 1.0
+      "target": "src_api_apipost"
     },
     {
       "relation": "imports",
@@ -486,9 +516,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_api_gettoken",
-      "confidence_score": 1.0
+      "target": "src_api_gettoken"
     },
     {
       "relation": "imports",
@@ -497,9 +527,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_api_setauthfailhandler",
-      "confidence_score": 1.0
+      "target": "src_api_setauthfailhandler"
     },
     {
       "relation": "imports",
@@ -508,9 +538,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_api_settoken",
-      "confidence_score": 1.0
+      "target": "src_api_settoken"
     },
     {
       "relation": "contains",
@@ -521,6 +551,16 @@
       "confidence_score": 1.0,
       "source": "src_app",
       "target": "src_app_adminview"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L256",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_allocationbar",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -648,9 +688,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L707",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_app_forexbetadashboard",
-      "confidence_score": 1.0
+      "target": "src_app_forexbetadashboard"
     },
     {
       "relation": "contains",
@@ -668,9 +708,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L99",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "src_app_forexwalletpanel",
-      "confidence_score": 1.0
+      "target": "src_app_forexwalletpanel"
     },
     {
       "relation": "contains",
@@ -756,6 +796,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/App.jsx",
+      "source_location": "L279",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "src_app_recommendationsview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
       "source_location": "L231",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -766,11 +816,21 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/App.jsx",
-      "source_location": "L776",
+      "source_location": "L228",
       "weight": 1.0,
       "source": "src_app",
-      "target": "src_app_settingsview",
+      "target": "src_app_segcard",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L776",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app",
+      "target": "src_app_settingsview"
     },
     {
       "relation": "contains",
@@ -870,6 +930,28 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/App.jsx",
+      "source_location": "L348",
+      "weight": 1.0,
+      "source": "src_app_recommendationsview",
+      "target": "src_app_fmt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L245",
+      "weight": 1.0,
+      "source": "src_app_segcard",
+      "target": "src_app_fmt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
       "source_location": "L50",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -894,9 +976,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L105",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_forexwalletpanel",
-      "target": "src_app_fmtusd",
-      "confidence_score": 1.0
+      "target": "src_app_fmtusd"
     },
     {
       "relation": "calls",
@@ -960,9 +1042,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L708",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_forexbetadashboard",
-      "target": "src_app_usewallet",
-      "confidence_score": 1.0
+      "target": "src_app_usewallet"
     },
     {
       "relation": "calls",
@@ -1015,9 +1097,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_usewallet",
-      "target": "src_api_apiget",
-      "confidence_score": 1.0
+      "target": "src_api_apiget"
     },
     {
       "relation": "calls",
@@ -1070,9 +1152,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L32",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_usecandles",
-      "target": "src_api_apiget",
-      "confidence_score": 1.0
+      "target": "src_api_apiget"
     },
     {
       "relation": "calls",
@@ -1092,9 +1174,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L712",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_forexbetadashboard",
-      "target": "src_app_uselivestream",
-      "confidence_score": 1.0
+      "target": "src_app_uselivestream"
     },
     {
       "relation": "calls",
@@ -1103,9 +1185,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L49",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_uselivestream",
-      "target": "src_api_gettoken",
-      "confidence_score": 1.0
+      "target": "src_api_gettoken"
     },
     {
       "relation": "calls",
@@ -1114,9 +1196,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L91",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_walletpanel",
-      "target": "src_api_apipost",
-      "confidence_score": 1.0
+      "target": "src_api_apipost"
     },
     {
       "relation": "calls",
@@ -1125,9 +1207,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L112",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_forexwalletpanel",
-      "target": "src_api_apipost",
-      "confidence_score": 1.0
+      "target": "src_api_apipost"
     },
     {
       "relation": "calls",
@@ -1136,9 +1218,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L151",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_positions",
-      "target": "src_api_apipost",
-      "confidence_score": 1.0
+      "target": "src_api_apipost"
     },
     {
       "relation": "calls",
@@ -1147,9 +1229,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L236",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_dashboard",
-      "target": "src_api_apiget",
-      "confidence_score": 1.0
+      "target": "src_api_apiget"
     },
     {
       "relation": "calls",
@@ -1158,9 +1240,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L244",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_dashboard",
-      "target": "src_api_apipost",
-      "confidence_score": 1.0
+      "target": "src_api_apipost"
     },
     {
       "relation": "calls",
@@ -1169,9 +1251,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L326",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_optionsview",
-      "target": "src_api_apipost",
-      "confidence_score": 1.0
+      "target": "src_api_apipost"
     },
     {
       "relation": "calls",
@@ -1180,9 +1262,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L356",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_futuresview",
-      "target": "src_api_apipost",
-      "confidence_score": 1.0
+      "target": "src_api_apipost"
     },
     {
       "relation": "calls",
@@ -1191,9 +1273,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L388",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_equityview",
-      "target": "src_api_apiget",
-      "confidence_score": 1.0
+      "target": "src_api_apiget"
     },
     {
       "relation": "calls",
@@ -1202,9 +1284,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L395",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_equityview",
-      "target": "src_api_apipost",
-      "confidence_score": 1.0
+      "target": "src_api_apipost"
     },
     {
       "relation": "calls",
@@ -1213,9 +1295,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L460",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_forexview",
-      "target": "src_api_apiget",
-      "confidence_score": 1.0
+      "target": "src_api_apiget"
     },
     {
       "relation": "calls",
@@ -1224,9 +1306,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L482",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_forexview",
-      "target": "src_api_apipost",
-      "confidence_score": 1.0
+      "target": "src_api_apipost"
     },
     {
       "relation": "calls",
@@ -1235,9 +1317,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L563",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_recoview",
-      "target": "src_api_apiget",
-      "confidence_score": 1.0
+      "target": "src_api_apiget"
     },
     {
       "relation": "calls",
@@ -1246,9 +1328,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L569",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_recoview",
-      "target": "src_api_apipost",
-      "confidence_score": 1.0
+      "target": "src_api_apipost"
     },
     {
       "relation": "calls",
@@ -1257,9 +1339,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L596",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_histrow",
-      "target": "src_api_apipost",
-      "confidence_score": 1.0
+      "target": "src_api_apipost"
     },
     {
       "relation": "calls",
@@ -1268,9 +1350,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L617",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_historyview",
-      "target": "src_api_apiget",
-      "confidence_score": 1.0
+      "target": "src_api_apiget"
     },
     {
       "relation": "calls",
@@ -1279,9 +1361,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L645",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_adminview",
-      "target": "src_api_apiget",
-      "confidence_score": 1.0
+      "target": "src_api_apiget"
     },
     {
       "relation": "calls",
@@ -1290,9 +1372,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L650",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_adminview",
-      "target": "src_api_apipost",
-      "confidence_score": 1.0
+      "target": "src_api_apipost"
     },
     {
       "relation": "calls",
@@ -1301,9 +1383,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L686",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_askview",
-      "target": "src_api_apipost",
-      "confidence_score": 1.0
+      "target": "src_api_apipost"
     },
     {
       "relation": "calls",
@@ -1312,9 +1394,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L721",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_forexbetadashboard",
-      "target": "src_api_apipost",
-      "confidence_score": 1.0
+      "target": "src_api_apipost"
     },
     {
       "relation": "calls",
@@ -1323,9 +1405,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L816",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_settingsview",
-      "target": "src_api_apidelete",
-      "confidence_score": 1.0
+      "target": "src_api_apidelete"
     },
     {
       "relation": "calls",
@@ -1334,9 +1416,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L785",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_settingsview",
-      "target": "src_api_apiget",
-      "confidence_score": 1.0
+      "target": "src_api_apiget"
     },
     {
       "relation": "calls",
@@ -1345,9 +1427,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L791",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_settingsview",
-      "target": "src_api_apipost",
-      "confidence_score": 1.0
+      "target": "src_api_apipost"
     },
     {
       "relation": "calls",
@@ -1356,9 +1438,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L947",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_changepassword",
-      "target": "src_api_apipost",
-      "confidence_score": 1.0
+      "target": "src_api_apipost"
     },
     {
       "relation": "calls",
@@ -1367,9 +1449,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L998",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_authgate",
-      "target": "src_api_apipost",
-      "confidence_score": 1.0
+      "target": "src_api_apipost"
     },
     {
       "relation": "calls",
@@ -1378,9 +1460,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L999",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app_authgate",
-      "target": "src_api_settoken",
-      "confidence_score": 1.0
+      "target": "src_api_settoken"
     },
     {
       "relation": "contains",
@@ -1388,9 +1470,9 @@
       "source_file": "src/api.js",
       "source_location": "L38",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_api",
-      "target": "src_api_apidelete",
-      "confidence_score": 1.0
+      "target": "src_api_apidelete"
     },
     {
       "relation": "contains",
@@ -1398,9 +1480,9 @@
       "source_file": "src/api.js",
       "source_location": "L36",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_api",
-      "target": "src_api_apiget",
-      "confidence_score": 1.0
+      "target": "src_api_apiget"
     },
     {
       "relation": "contains",
@@ -1408,9 +1490,9 @@
       "source_file": "src/api.js",
       "source_location": "L37",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_api",
-      "target": "src_api_apipost",
-      "confidence_score": 1.0
+      "target": "src_api_apipost"
     },
     {
       "relation": "contains",
@@ -1418,9 +1500,9 @@
       "source_file": "src/api.js",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_api",
-      "target": "src_api_gettoken",
-      "confidence_score": 1.0
+      "target": "src_api_gettoken"
     },
     {
       "relation": "contains",
@@ -1428,9 +1510,9 @@
       "source_file": "src/api.js",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_api",
-      "target": "src_api_islocal",
-      "confidence_score": 1.0
+      "target": "src_api_islocal"
     },
     {
       "relation": "contains",
@@ -1438,9 +1520,9 @@
       "source_file": "src/api.js",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_api",
-      "target": "src_api_onauthfail",
-      "confidence_score": 1.0
+      "target": "src_api_onauthfail"
     },
     {
       "relation": "contains",
@@ -1448,9 +1530,9 @@
       "source_file": "src/api.js",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_api",
-      "target": "src_api_req",
-      "confidence_score": 1.0
+      "target": "src_api_req"
     },
     {
       "relation": "contains",
@@ -1458,9 +1540,9 @@
       "source_file": "src/api.js",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_api",
-      "target": "src_api_setauthfailhandler",
-      "confidence_score": 1.0
+      "target": "src_api_setauthfailhandler"
     },
     {
       "relation": "contains",
@@ -1468,9 +1550,9 @@
       "source_file": "src/api.js",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_api",
-      "target": "src_api_settoken",
-      "confidence_score": 1.0
+      "target": "src_api_settoken"
     },
     {
       "relation": "calls",
@@ -1479,9 +1561,9 @@
       "source_file": "src/api.js",
       "source_location": "L22",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_api_req",
-      "target": "src_api_gettoken",
-      "confidence_score": 1.0
+      "target": "src_api_gettoken"
     },
     {
       "relation": "calls",
@@ -1490,9 +1572,9 @@
       "source_file": "src/api.js",
       "source_location": "L29",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_api_req",
-      "target": "src_api_settoken",
-      "confidence_score": 1.0
+      "target": "src_api_settoken"
     },
     {
       "relation": "calls",
@@ -1501,9 +1583,9 @@
       "source_file": "src/api.js",
       "source_location": "L29",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_api_req",
-      "target": "src_api_onauthfail",
-      "confidence_score": 1.0
+      "target": "src_api_onauthfail"
     },
     {
       "relation": "calls",
@@ -1512,9 +1594,9 @@
       "source_file": "src/api.js",
       "source_location": "L38",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_api_apidelete",
-      "target": "src_api_req",
-      "confidence_score": 1.0
+      "target": "src_api_req"
     },
     {
       "relation": "calls",
@@ -1523,9 +1605,9 @@
       "source_file": "src/api.js",
       "source_location": "L36",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_api_apiget",
-      "target": "src_api_req",
-      "confidence_score": 1.0
+      "target": "src_api_req"
     },
     {
       "relation": "calls",
@@ -1534,11 +1616,11 @@
       "source_file": "src/api.js",
       "source_location": "L37",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_api_apipost",
-      "target": "src_api_req",
-      "confidence_score": 1.0
+      "target": "src_api_req"
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "f0b28efa9947e786145391d8d8603252eea990e8"
+  "built_at_commit": "f8a92d72adccd1625b1f6c6b3a16acc75cf8d61d"
 }

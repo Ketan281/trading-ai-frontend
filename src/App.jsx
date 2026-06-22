@@ -1,6 +1,17 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { apiGet, apiPost, apiDelete, getToken, setToken, setAuthFailHandler, API } from './api'
 import CandleChart from './CandleChart.jsx'
+import RegimeStrip from './components/RegimeStrip.jsx'
+import RegimeMonitor from './components/RegimeMonitor.jsx'
+import PsychologyDashboard from './components/PsychologyDashboard.jsx'
+import TradeExplainer from './components/TradeExplainer.jsx'
+import PaperTrading from './components/PaperTrading.jsx'
+import ReflectionLab from './components/ReflectionLab.jsx'
+import QuantLab from './components/QuantLab.jsx'
+import OptionsHub from './components/OptionsHub.jsx'
+import EquityHub from './components/EquityHub.jsx'
+import SwingHub from './components/SwingHub.jsx'
+import Portfolio from './components/Portfolio.jsx'
 
 const fmt = (n) => n == null ? '–' : '₹' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 })
 const fmtUsd = (n) => n == null ? '–' : '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 })
@@ -178,356 +189,9 @@ function PnlMiniChart({ series, fx }) {
   </svg>
 }
 
-// ── mode toggle — separate for Indian + Forex ──
-function DualModeToggle({ indianMode, forexMode, onToggle, toggling, autoOpened }) {
-  return <div className="dual-mode">
-    <div className="mode-toggle">
-      <div className="mode-label">Indian Market — ML Mode</div>
-      <div className="mode-switch">
-        <button className={'mode-btn' + (indianMode !== 'ml' ? ' active' : '')}
-                disabled={toggling} onClick={() => onToggle('custom', 'indian')}>
-          Custom <span className="mode-desc">Manual trading</span>
-        </button>
-        <button className={'mode-btn ml' + (indianMode === 'ml' ? ' active' : '')}
-                disabled={toggling} onClick={() => onToggle('ml', 'indian')}>
-          ML Auto <span className="mode-desc">System picks & manages</span>
-        </button>
-      </div>
-      {indianMode === 'ml' && <div className="mode-info">
-        Auto-trades Indian market during 9:15–15:15 IST. Picks best option/future, manages SL & target.
-      </div>}
-    </div>
-    <div className="mode-toggle">
-      <div className="mode-label">Forex — ML Mode</div>
-      <div className="mode-switch">
-        <button className={'mode-btn' + (forexMode !== 'ml' ? ' active' : '')}
-                disabled={toggling} onClick={() => onToggle('custom', 'forex')}>
-          Custom <span className="mode-desc">Manual trading</span>
-        </button>
-        <button className={'mode-btn ml' + (forexMode === 'ml' ? ' active' : '')}
-                disabled={toggling} onClick={() => onToggle('ml', 'forex')}>
-          ML Auto <span className="mode-desc">24/5 confluence engine</span>
-        </button>
-      </div>
-      {forexMode === 'ml' && <div className="mode-info">
-        Auto-trades forex 24/5 using multi-timeframe confluence (27 indicators). Manages SL & TP automatically.
-      </div>}
-    </div>
-    {autoOpened && autoOpened.length > 0 && <div className="auto-opened-feedback">
-      {autoOpened.map((a, i) => <div key={i} className={'auto-msg ' + (a.error ? 'err' : a.trade ? 'ok' : '')}>
-        <b>{a.market?.toUpperCase()}:</b>{' '}
-        {a.trade ? `Opened ${a.symbol} (${a.trade.side})` :
-         a.error ? `Error: ${a.error}` :
-         a.info || 'No trade available'}
-      </div>)}
-    </div>}
-  </div>
-}
-
-// ── Segment Recommendation Card ──
-function SegCard({ pick, segment, label }) {
-  if (!pick) return <div className="seg-card">
-    <div className="seg-card-head"><span className={`seg-label ${segment}`}>{label}</span></div>
-    <div className="seg-no-pick">No recommendation right now</div>
-  </div>
-  const confCls = pick.confidence >= 70 ? 'high' : pick.confidence >= 45 ? 'mid' : 'low'
-  return <div className="seg-card">
-    <div className="seg-card-head">
-      <span className={`seg-label ${segment}`}>{label}</span>
-      <div className="seg-conf">
-        <div className={`seg-conf-val ${confCls}`}>{pick.confidence}%</div>
-        <div className="seg-conf-label">confidence</div>
-      </div>
-    </div>
-    <div className="seg-symbol">{pick.symbol}</div>
-    <span className={`seg-action ${pick.action}`}>{pick.action}</span>
-    <div className="seg-meta">
-      <span>Entry <b>{fmt(pick.entry)}</b></span>
-      <span>SL <b>{fmt(pick.stop)}</b></span>
-      <span>TGT <b>{fmt(pick.target)}</b></span>
-      <span>R:R <b>{pick.reward_risk}:1</b></span>
-      {pick.grade && <span>Grade <b>{pick.grade}</b></span>}
-    </div>
-    <div className="seg-reason">{pick.reason}</div>
-  </div>
-}
-
-// ── Capital Allocation Bar ──
-function AllocationBar({ allocation, balance }) {
-  if (!allocation) return null
-  const segs = ['equity_intraday', 'options', 'swing']
-  const labels = { equity_intraday: 'Equity', options: 'Options', swing: 'Swing' }
-  const active = segs.filter(s => allocation[s]?.allocation_pct > 0)
-  if (!active.length) return <div className="mut" style={{ marginTop: 10 }}>No allocations — no confident picks available.</div>
-  return <>
-    <div className="alloc-bar">
-      {active.map(s => <div key={s} className={`alloc-seg ${s}`}
-        style={{ flex: allocation[s].allocation_pct }}>
-        {allocation[s].allocation_pct >= 10 ? `${allocation[s].allocation_pct}%` : ''}
-      </div>)}
-    </div>
-    <div className="alloc-legend">
-      {active.map(s => <span key={s}>
-        <span className={`alloc-dot ${s}`} />
-        {labels[s]}: {fmt(allocation[s].amount)} ({allocation[s].allocation_pct}%)
-      </span>)}
-    </div>
-  </>
-}
-
-// ── Recommendations Tab (refreshable) ──
-function RecommendationsView() {
-  const [data, setData] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [countdown, setCountdown] = useState(0)
-  const [allocation, setAllocation] = useState(null)
-  const [allocBalance, setAllocBalance] = useState(0)
-  const [segFilter, setSegFilter] = useState('all')
-
-  const load = useCallback(async () => {
-    setLoading(true)
-    try {
-      const [reco, alloc] = await Promise.all([
-        apiGet('/recommendations'),
-        apiGet('/recommendations/allocate'),
-      ])
-      setData(reco)
-      setAllocation(alloc.allocation)
-      setAllocBalance(alloc.balance)
-    } catch {} finally { setLoading(false); setCountdown(1800) }
-  }, [])
-
-  useEffect(() => { load() }, [load])
-
-  useEffect(() => {
-    if (countdown <= 0) return
-    const t = setInterval(() => setCountdown(c => {
-      if (c <= 1) { load(); return 0 }
-      return c - 1
-    }), 1000)
-    return () => clearInterval(t)
-  }, [countdown > 0])
-
-  const fmtTime = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
-
-  const allPicks = data ? [
-    ...(data.equity_intraday || []).map((p, i) => ({ ...p, _rank: i + 1 })),
-    ...(data.options || []).map((p, i) => ({ ...p, _rank: i + 1 })),
-    ...(data.swing || []).map((p, i) => ({ ...p, _rank: i + 1 })),
-  ].sort((a, b) => b.confidence - a.confidence) : []
-
-  const filtered = segFilter === 'all' ? allPicks : allPicks.filter(p => p.segment === segFilter)
-  const segLabels = { equity_intraday: 'Equity Intraday', options: 'Options', swing: 'Swing' }
-
-  return <>
-    <h2>Recommendations</h2>
-    <div className="crumb">
-      Confidence-sorted picks across all segments
-      <span className="countdown"> · auto-refresh in {fmtTime(countdown)}</span>
-    </div>
-
-    <div className="row" style={{ marginBottom: 12, gap: 8 }}>
-      <button className={`refresh-btn`} onClick={load} disabled={loading}>
-        {loading ? <><span className="refresh-spin">↻</span> Scanning...</> : '↻ Refresh Now'}
-      </button>
-      <select value={segFilter} onChange={e => setSegFilter(e.target.value)} style={{ fontSize: 13 }}>
-        <option value="all">All Segments</option>
-        <option value="equity_intraday">Equity Intraday</option>
-        <option value="options">Options</option>
-        <option value="swing">Swing</option>
-      </select>
-      {data?.timestamp && <span className="mut" style={{ fontSize: 11, marginLeft: 'auto' }}>
-        Last scan: {data.timestamp}
-      </span>}
-    </div>
-
-    {/* Capital Allocation */}
-    <div className="panel">
-      <h3>Capital Allocation (Custom Mode)</h3>
-      <div className="mut" style={{ fontSize: 12, marginBottom: 6 }}>
-        Budget {fmt(allocBalance)} divided by confidence across segments
-      </div>
-      <AllocationBar allocation={allocation} balance={allocBalance} />
-    </div>
-
-    {/* Best per segment */}
-    <div className="panel">
-      <h3>Best Pick Per Segment</h3>
-      <div className="seg-cards">
-        <SegCard pick={data?.best_per_segment?.equity_intraday} segment="equity_intraday" label="Intraday Equity" />
-        <SegCard pick={data?.best_per_segment?.options} segment="options" label="Options" />
-        <SegCard pick={data?.best_per_segment?.swing} segment="swing" label="Swing" />
-      </div>
-    </div>
-
-    {/* Full sorted list */}
-    <div className="panel">
-      <h3>All Recommendations ({filtered.length})</h3>
-      {loading && !data && <div className="mut">Scanning markets...</div>}
-      {filtered.length === 0 && !loading && <div className="mut" style={{ padding: 16 }}>No picks match the current filter.</div>}
-      <div className="reco-list">
-        {filtered.map((p, i) => {
-          const confCls = p.confidence >= 70 ? 'high' : p.confidence >= 45 ? 'mid' : 'low'
-          return <div key={`${p.segment}-${p.symbol}-${i}`} className="reco-item">
-            <div className="reco-rank">{i + 1}</div>
-            <div className="reco-body">
-              <b>{p.symbol}</b>{' '}
-              <span className={`seg-label ${p.segment}`}>{segLabels[p.segment] || p.segment}</span>{' '}
-              <span className={`seg-action ${p.action}`}>{p.action}</span>
-              <div className="seg-meta">
-                <span>Entry <b>{fmt(p.entry)}</b></span>
-                <span>SL <b>{fmt(p.stop)}</b></span>
-                <span>TGT <b>{fmt(p.target)}</b></span>
-                <span>R:R <b>{p.reward_risk}:1</b></span>
-                {p.grade && <span>Grade <b>{p.grade}</b></span>}
-              </div>
-            </div>
-            <div className="reco-right">
-              <div className={`seg-conf-val ${confCls}`}>{p.confidence}%</div>
-              <div className="seg-conf-label">confidence</div>
-            </div>
-          </div>
-        })}
-      </div>
-    </div>
-  </>
-}
-
 // ── views ──
-function Dashboard({ tradingMode }) {
-  const { data, refresh } = useWallet()
-  const [reco, setReco] = useState(null)
-  const [segReco, setSegReco] = useState(null)
-  const [segLoading, setSegLoading] = useState(true)
-  const [indianMode, setIndianMode] = useState('custom')
-  const [toggling, setToggling] = useState(false)
-  const [autoOpened, setAutoOpened] = useState(null)
-  const live = useLiveStream()
-
-  useEffect(() => { apiGet('/recommendation').then(setReco).catch((e) => setReco({ answer: e.message })) }, [])
-  useEffect(() => {
-    apiGet('/recommendations').then(setSegReco).catch(() => {}).finally(() => setSegLoading(false))
-  }, [])
-  useEffect(() => {
-    if (data?.indian_trade_mode) setIndianMode(data.indian_trade_mode)
-  }, [data])
-
-  async function toggleMode(mode) {
-    setToggling(true); setAutoOpened(null)
-    try {
-      const r = await apiPost('/me/mode/indian', { mode })
-      if (r.auto_opened) setAutoOpened(r.auto_opened)
-      setIndianMode(mode); refresh()
-    } catch (e) { alert(e.message) } finally { setToggling(false) }
-  }
-
-  const merged = data ? { ...data } : null
-  if (merged && live) {
-    merged.live_equity = live.indian_equity ?? merged.live_equity
-    if (live.trades?.length) {
-      merged.unrealized = live.trades.filter(t => t.segment !== 'forex').reduce((s, t) => s + (t.gross_pnl || 0), 0)
-    }
-  }
-  const displayData = merged
-  const indianTrades = displayData?.indian_open_trades || (displayData?.open_trades || []).filter(t => t.segment !== 'forex')
-
-  return <>
-    <h2>Dashboard</h2>
-    <div className="crumb">Indian market · {tradingMode === 'live' ? 'Live trading' : 'Paper trading'}</div>
-
-    {tradingMode === 'live' && <div className="panel live-badge-panel">
-      <span className="live-dot" /> You are in <b>LIVE</b> trading mode. Real orders go to your broker.
-    </div>}
-
-    <div className="mode-toggle" style={{ marginBottom: 16 }}>
-      <div className="mode-label">ML Auto-Trading</div>
-      <div className="mode-switch">
-        <button className={'mode-btn' + (indianMode !== 'ml' ? ' active' : '')}
-                disabled={toggling} onClick={() => toggleMode('custom')}>
-          Custom <span className="mode-desc">Manual trading</span>
-        </button>
-        <button className={'mode-btn ml' + (indianMode === 'ml' ? ' active' : '')}
-                disabled={toggling} onClick={() => toggleMode('ml')}>
-          ML Auto <span className="mode-desc">System picks & manages</span>
-        </button>
-      </div>
-      {indianMode === 'ml' && <div className="mode-info">
-        Auto-trades Indian market during 9:15–15:15 IST. Picks best option/future, manages SL & target.
-      </div>}
-      {autoOpened && autoOpened.length > 0 && <div className="auto-opened-feedback">
-        {autoOpened.map((a, i) => <div key={i} className={'auto-msg ' + (a.error ? 'err' : a.trade ? 'ok' : '')}>
-          {a.trade ? `Opened ${a.symbol} (${a.trade.side})` :
-           a.error ? `Error: ${a.error}` : a.info || 'No trade available'}
-        </div>)}
-      </div>}
-    </div>
-    {toggling && <div className="mut">Switching mode...</div>}
-
-    <WalletPanel wallet={displayData?.wallet || displayData?.indian_wallet} refresh={refresh} />
-    <LiveEquityBar data={displayData} />
-
-    {/* Per-segment best recommendations */}
-    <div className="panel">
-      <h3>Best Picks by Segment</h3>
-      {segLoading ? <div className="mut">Scanning sectors...</div> :
-        <div className="seg-cards">
-          <SegCard pick={segReco?.best_per_segment?.equity_intraday} segment="equity_intraday" label="Intraday Equity" />
-          <SegCard pick={segReco?.best_per_segment?.options} segment="options" label="Options" />
-          <SegCard pick={segReco?.best_per_segment?.swing} segment="swing" label="Swing" />
-        </div>}
-    </div>
-
-    {indianMode === 'ml' &&
-      <div className="panel ml-panel"><h3>ML Auto-Trading Active</h3>
-        <div className="answer">
-          <div>Indian market: auto-managed during 9:15–15:15 IST</div>
-          <div className="mut" style={{ marginTop: 6 }}>Background loop runs every 60s. Entries with SL + target, auto-exit on hit or square-off time.</div>
-        </div>
-      </div>}
-
-    {indianMode !== 'ml' && <div className="panel"><h3>Today's best idea</h3>
-      {reco ? <div className="answer">{reco.answer}</div> : <div className="mut">Loading...</div>}
-    </div>}
-
-    <div className="panel">
-      <h3>Open Positions ({indianTrades.length})</h3>
-      <Positions trades={indianTrades} refresh={refresh} />
-      {indianTrades.map(t => <PnlMiniChart key={t.id} series={t.pnl_series} fx={false} />)}
-    </div>
-    <div className="foot">Quantitative engines produce every number · the AI only summarizes</div>
-  </>
-}
 
 function TradeButtons({ msg }) { return msg ? <div className="crumb" style={{ marginTop: 8 }}>{msg}</div> : null }
-
-function OptionsView({ sym }) {
-  const { data, refresh } = useWallet()
-  const candles = useCandles(sym)
-  const [levels, setLevels] = useState(null)
-  const [msg, setMsg] = useState('')
-  async function take(leg) {
-    setMsg('Placing...')
-    try {
-      const r = await apiPost('/me/trade', { segment: 'options', underlying: sym, leg })
-      if (r.error) { setMsg(r.error); return }
-      const t = r.trade
-      setLevels({ entry: t.entry, stop: t.stop, target: t.target })
-      setMsg(`Opened ${t.symbol} @ ${fmt(t.entry)} x${t.qty} (SL ${fmt(t.stop)} · TGT ${fmt(t.target)})`)
-      refresh()
-    } catch (e) { setMsg(e.message) }
-  }
-  const indianTrades = (data?.open_trades || []).filter(t => t.segment !== 'forex')
-  return <>
-    <h2>Options · {sym}</h2><div className="crumb">ATM weekly option — buy CE or PE</div>
-    <div className="row">
-      <button className="trade-btn buy" onClick={() => take('CE')}>Buy {sym} CE (ATM)</button>
-      <button className="trade-btn sell" onClick={() => take('PE')}>Buy {sym} PE (ATM)</button>
-    </div>
-    <TradeButtons msg={msg} />
-    <CandleChart candles={candles} levels={levels} title={`${sym} · 5m`} />
-    <div className="panel"><h3>Open positions</h3><Positions trades={indianTrades} refresh={refresh} /></div>
-  </>
-}
 
 function FuturesView() {
   const { data, refresh } = useWallet()
@@ -556,77 +220,6 @@ function FuturesView() {
     </div>
     <TradeButtons msg={msg} />
     <CandleChart candles={candles} levels={levels} title={`${sym} · 5m`} />
-    <div className="panel"><h3>Open positions</h3><Positions trades={indianTrades} refresh={refresh} /></div>
-  </>
-}
-
-function EquityView() {
-  const { data, refresh } = useWallet()
-  const [sym, setSym] = useState('RELIANCE')
-  const [qty, setQty] = useState('')
-  const candles = useCandles(sym.toUpperCase().trim())
-  const [levels, setLevels] = useState(null)
-  const [msg, setMsg] = useState('')
-  const [eqReco, setEqReco] = useState(null)
-  const [recoLoading, setRecoLoading] = useState(true)
-  useEffect(() => {
-    apiGet('/equity/recommendation').then(setEqReco).catch(() => {}).finally(() => setRecoLoading(false))
-  }, [])
-  async function take(side) {
-    const spec = { segment: 'equity', symbol: sym.toUpperCase().trim(), side }
-    if (qty) spec.qty = Number(qty)
-    setMsg('Placing...')
-    try {
-      const r = await apiPost('/me/trade', spec)
-      if (r.error) { setMsg(r.error); return }
-      const t = r.trade
-      setLevels({ entry: t.entry, stop: t.stop, target: t.target })
-      setMsg(`Opened ${t.symbol} @ ${fmt(t.entry)} x${t.qty}`); refresh()
-    } catch (e) { setMsg(e.message) }
-  }
-  async function takeReco() {
-    const spec = eqReco?.recommendation?.spec
-    if (!spec) return
-    setMsg('Placing recommended trade...')
-    try {
-      const r = await apiPost('/me/trade', spec)
-      if (r.error) { setMsg(r.error); return }
-      const t = r.trade
-      setLevels({ entry: t.entry, stop: t.stop, target: t.target })
-      setMsg(`Opened ${t.symbol} @ ${fmt(t.entry)} x${t.qty}`); refresh()
-    } catch (e) { setMsg(e.message) }
-  }
-  const indianTrades = (data?.open_trades || []).filter(t => t.segment !== 'forex')
-  const reco = eqReco?.recommendation
-  const picks = eqReco?.screener_picks || []
-  return <>
-    <h2>Intraday Equity</h2><div className="crumb">Cash-segment intraday on a liquid stock</div>
-
-    {recoLoading && <div className="panel"><div className="mut">Scanning for best equity trade...</div></div>}
-    {reco && <div className="panel reco-panel">
-      <h3>Best Equity Recommendation</h3>
-      <div className="answer">{reco.answer}</div>
-      {reco.spec && <button className="take-trade-btn" onClick={takeReco}>Execute This Trade</button>}
-    </div>}
-    {picks.length > 0 && <div className="panel">
-      <h3>Top Screener Picks</h3>
-      <div className="picks-grid">
-        {picks.map((p, i) => <div key={i} className="pick-card" onClick={() => setSym(p.symbol || p.ticker || '')}>
-          <b>{p.symbol || p.ticker}</b>
-          {p.score != null && <span className="pick-score">{p.score.toFixed?.(1) ?? p.score}</span>}
-          {p.reason && <div className="mut">{p.reason}</div>}
-        </div>)}
-      </div>
-    </div>}
-
-    <div className="row">
-      <input className="sm" value={sym} onChange={(e) => setSym(e.target.value)} placeholder="SYMBOL" />
-      <input className="sm" type="number" value={qty} onChange={(e) => setQty(e.target.value)} placeholder="qty (auto)" />
-      <button className="trade-btn buy" onClick={() => take('long')}>Buy Long</button>
-      <button className="trade-btn sell" onClick={() => take('short')}>Sell Short</button>
-    </div>
-    <TradeButtons msg={msg} />
-    <CandleChart candles={candles} levels={levels} title={`${sym.toUpperCase()} · 5m`} />
     <div className="panel"><h3>Open positions</h3><Positions trades={indianTrades} refresh={refresh} /></div>
   </>
 }
@@ -1108,16 +701,21 @@ function SettingsView({ tradingMode, setTradingMode }) {
 
 // ── sidebar / shell / auth ──
 const NAV = [
-  { id: 'dashboard', label: 'Dashboard' },
   { group: 'Indian Market' },
-  { id: 'recommendations', label: 'Recommendations' },
-  { id: 'opt-NIFTY', label: 'Options · NIFTY', sub: true },
-  { id: 'opt-BANKNIFTY', label: 'Options · BANKNIFTY', sub: true },
-  { id: 'futures', label: 'Futures (Beta)', sub: true },
+  { id: 'options', label: 'Options' },
   { id: 'equity', label: 'Intraday Equity' },
+  { id: 'swing', label: 'Swing Trades' },
+  { id: 'futures', label: 'Futures (Beta)', sub: true },
+  { id: 'portfolio', label: 'Portfolio' },
   { group: 'Forex (Beta)' },
-  { id: 'forex-dashboard', label: 'Forex Dashboard', sub: false },
+  { id: 'forex-dashboard', label: 'Forex Dashboard' },
   { id: 'forex', label: 'Trade Forex', sub: true },
+  { group: 'Intelligence' },
+  { id: 'regime', label: 'Market Regime' },
+  { id: 'psychology', label: 'Risk & Psychology' },
+  { id: 'paper', label: 'Paper Trading' },
+  { id: 'journal', label: 'Trade Journal' },
+  { id: 'research', label: 'Research Lab' },
   { group: 'Tools' },
   { id: 'reco', label: 'Best Recommendation' },
   { id: 'ask', label: 'Ask AI' },
@@ -1263,9 +861,10 @@ function AuthGate({ onAuth }) {
 
 export default function App() {
   const [user, setUser] = useState(null)
-  const [view, setView] = useState('dashboard')
+  const [view, setView] = useState('options')
   const [booting, setBooting] = useState(true)
   const [tradingMode, setTradingMode] = useState('paper')
+  const [explainRec, setExplainRec] = useState(null)
 
   useEffect(() => {
     setAuthFailHandler(() => setUser(null))
@@ -1284,26 +883,32 @@ export default function App() {
 
   if (booting) return <div className="authwrap"><div className="mut">Loading...</div></div>
   if (!user) return <AuthGate onAuth={(u) => {
-    setUser(u); setView('dashboard')
+    setUser(u); setView('options')
     apiGet('/me/trading-mode').then(r => setTradingMode(r.trading_mode || 'paper')).catch(() => {})
   }} />
 
   return <div className="app">
     <Sidebar user={user} view={view} setView={setView} onLogout={logout} tradingMode={tradingMode} />
     <main className="main">
-      {view === 'dashboard' && <Dashboard tradingMode={tradingMode} />}
-      {view === 'recommendations' && <RecommendationsView />}
-      {view === 'opt-NIFTY' && <OptionsView sym="NIFTY" key="optn" />}
-      {view === 'opt-BANKNIFTY' && <OptionsView sym="BANKNIFTY" key="optb" />}
+      <RegimeStrip />
+      {view === 'options' && <OptionsHub onExplain={setExplainRec} />}
+      {view === 'equity' && <EquityHub onExplain={setExplainRec} />}
+      {view === 'swing' && <SwingHub onExplain={setExplainRec} />}
       {view === 'futures' && <FuturesView />}
-      {view === 'equity' && <EquityView />}
+      {view === 'portfolio' && <Portfolio />}
       {view === 'forex-dashboard' && <ForexBetaDashboard />}
       {view === 'forex' && <ForexView />}
+      {view === 'regime' && <RegimeMonitor />}
+      {view === 'psychology' && <PsychologyDashboard />}
+      {view === 'paper' && <PaperTrading />}
+      {view === 'journal' && <ReflectionLab />}
+      {view === 'research' && <QuantLab />}
       {view === 'reco' && <RecoView />}
       {view === 'ask' && <AskView />}
       {view === 'history' && <HistoryView />}
       {view === 'settings' && <SettingsView tradingMode={tradingMode} setTradingMode={setTradingMode} />}
       {view === 'admin' && <AdminView user={user} />}
+      {explainRec && <TradeExplainer rec={explainRec} onClose={() => setExplainRec(null)} />}
     </main>
   </div>
 }
