@@ -5,8 +5,8 @@
     "semantic_hash": ""
   },
   "src/App.jsx": {
-    "mtime": 1782069579.9606597,
-    "ast_hash": "11e4d91e7c2dfe5b6d47b14dca5393cd",
+    "mtime": 1782185095.412422,
+    "ast_hash": "0196876ed88b966c619116cd6cf29bfc",
     "semantic_hash": ""
   },
   "src/CandleChart.jsx": {
@@ -47,6 +47,36 @@
   ".claude/launch.json": {
     "mtime": 1782067748.3614736,
     "ast_hash": "037365beba45e42b49ece10b4b050ccf",
+    "semantic_hash": ""
+  },
+  "src/components/EquityHub.jsx": {
+    "mtime": 1782153692.219716,
+    "ast_hash": "1a1151f54a25013afc4b63a89c3ac4dd",
+    "semantic_hash": ""
+  },
+  "src/components/OptionsHub.jsx": {
+    "mtime": 1782153638.0372672,
+    "ast_hash": "3c796cbecbd38ea374cfe3538ebe3b58",
+    "semantic_hash": ""
+  },
+  "src/components/Portfolio.jsx": {
+    "mtime": 1782153783.6765409,
+    "ast_hash": "e8e0fd07cad5f7adee928a221cdaccff",
+    "semantic_hash": ""
+  },
+  "src/components/RegimeStrip.jsx": {
+    "mtime": 1782152637.6445947,
+    "ast_hash": "d89f869f272e2d31987dd40fc8ef5b6d",
+    "semantic_hash": ""
+  },
+  "src/components/SwingHub.jsx": {
+    "mtime": 1782153721.6016114,
+    "ast_hash": "e4980d0721a135b9b859990c3b1d14dd",
+    "semantic_hash": ""
+  },
+  "src/components/TradeExplainer.jsx": {
+    "mtime": 1782152206.2296317,
+    "ast_hash": "adc303d747a5b1290c9708c93e430448",
     "semantic_hash": ""
   }
 }
