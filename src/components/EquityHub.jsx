@@ -81,17 +81,7 @@ export default function EquityHub({ onExplain }) {
       <h2>Intraday Equity</h2>
       <div className="crumb">ML-graded cash-segment picks with action buttons</div>
 
-      {/* Manual trade */}
-      <div className="c" style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Manual Trade</div>
-        <div className="row">
-          <input className="sm" value={sym} onChange={(e) => setSym(e.target.value)} placeholder="SYMBOL" />
-          <input className="sm" type="number" value={qty} onChange={(e) => setQty(e.target.value)} placeholder="qty (auto)" />
-          <button className="trade-btn buy" onClick={() => trade('long')}>Buy Long</button>
-          <button className="trade-btn sell" onClick={() => trade('short')}>Sell Short</button>
-        </div>
-        {msg && <div className="crumb" style={{ marginTop: 8 }}>{msg}</div>}
-      </div>
+      {msg && <div className="crumb" style={{ marginBottom: 8 }}>{msg}</div>}
 
       {/* Best ML recommendation */}
       {eqReco && (

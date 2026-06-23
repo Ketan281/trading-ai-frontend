@@ -70,31 +70,7 @@ export default function OptionsHub({ onExplain }) {
       <h2>Options</h2>
       <div className="crumb">NIFTY & BANKNIFTY — best picks from ML pipeline with grading</div>
 
-      {/* Quick trade buttons */}
-      <div className="c" style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10 }}>Quick Trade</div>
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-          <div style={{ flex: 1, minWidth: 200 }}>
-            <div style={{ fontSize: 12, opacity: 0.6, marginBottom: 6 }}>NIFTY</div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button className="trade-btn buy" onClick={() => trade('NIFTY', 'CE')}
-                style={{ flex: 1 }}>Buy CE</button>
-              <button className="trade-btn sell" onClick={() => trade('NIFTY', 'PE')}
-                style={{ flex: 1 }}>Buy PE</button>
-            </div>
-          </div>
-          <div style={{ flex: 1, minWidth: 200 }}>
-            <div style={{ fontSize: 12, opacity: 0.6, marginBottom: 6 }}>BANKNIFTY</div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button className="trade-btn buy" onClick={() => trade('BANKNIFTY', 'CE')}
-                style={{ flex: 1 }}>Buy CE</button>
-              <button className="trade-btn sell" onClick={() => trade('BANKNIFTY', 'PE')}
-                style={{ flex: 1 }}>Buy PE</button>
-            </div>
-          </div>
-        </div>
-        {msg && <div className="crumb" style={{ marginTop: 8 }}>{msg}</div>}
-      </div>
+      {msg && <div className="crumb" style={{ marginBottom: 8 }}>{msg}</div>}
 
       {/* Best option pick from Phase 1 */}
       {best && (
