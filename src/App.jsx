@@ -2,12 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { apiGet, apiPost, apiDelete, getToken, setToken, setAuthFailHandler, API } from './api'
 import CandleChart from './CandleChart.jsx'
 import RegimeStrip from './components/RegimeStrip.jsx'
-import RegimeMonitor from './components/RegimeMonitor.jsx'
-import PsychologyDashboard from './components/PsychologyDashboard.jsx'
 import TradeExplainer from './components/TradeExplainer.jsx'
-import PaperTrading from './components/PaperTrading.jsx'
-import ReflectionLab from './components/ReflectionLab.jsx'
-import QuantLab from './components/QuantLab.jsx'
 import OptionsHub from './components/OptionsHub.jsx'
 import EquityHub from './components/EquityHub.jsx'
 import SwingHub from './components/SwingHub.jsx'
@@ -335,30 +330,134 @@ function ForexView() {
 
 function RecoView() {
   const { data, refresh } = useWallet()
-  const [reco, setReco] = useState(null)
-  const [levels, setLevels] = useState(null)
+  const [recos, setRecos] = useState(null)
+  const [eqReco, setEqReco] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [msg, setMsg] = useState('')
-  useEffect(() => { apiGet('/recommendation').then(setReco).catch((e) => setReco({ answer: e.message })) }, [])
-  const candles = useCandles(reco?.chart_symbol)
-  async function take() {
-    if (!reco?.spec) return
-    setMsg('Placing...')
+
+  useEffect(() => {
+    Promise.all([
+      apiGet('/recommendations').catch(() => null),
+      apiGet('/equity/recommendation').catch(() => null),
+    ]).then(([r, eq]) => {
+      setRecos(r)
+      setEqReco(eq)
+    }).finally(() => setLoading(false))
+  }, [])
+
+  async function placeTrade(spec) {
+    setMsg('Placing trade...')
     try {
-      const r = await apiPost('/me/trade', reco.spec)
+      const r = await apiPost('/me/trade', spec)
       if (r.error) { setMsg(r.error); return }
       const t = r.trade
-      setLevels({ entry: t.entry, stop: t.stop, target: t.target })
-      setMsg(`Opened ${t.symbol} @ ${fmt(t.entry)} x${t.qty}`); refresh()
+      setMsg(`Opened ${t.symbol} @ ${fmt(t.entry)} x${t.qty} (SL ${fmt(t.stop)} · TGT ${fmt(t.target)})`)
+      refresh()
     } catch (e) { setMsg(e.message) }
   }
+
+  const bestOpt = recos?.best_per_segment?.options
+  const bestEq = recos?.best_per_segment?.equity_intraday
+  const bestSwing = recos?.best_per_segment?.swing
+  const eqPick = eqReco?.recommendation
+
   return <>
-    <h2>Best Recommendation</h2><div className="crumb">Today's single highest-conviction idea</div>
-    {!reco ? <div className="mut">Computing today's best trade...</div> : <>
-      <div className="answer">{reco.answer}</div>
-      {reco.spec && <button className="take-trade-btn" onClick={take}>Execute This Trade</button>}
-      <TradeButtons msg={msg} />
-      <CandleChart candles={candles} levels={levels} title={reco.chart_symbol ? `${reco.chart_symbol} · 5m` : ''} />
-    </>}
+    <h2>Best Recommendation</h2>
+    <div className="crumb">Today's top picks across all segments — one click to execute</div>
+
+    {msg && <div className="panel"><div className="crumb">{msg}</div></div>}
+    {loading && <div className="mut">Scanning all markets for best setups...</div>}
+
+    {/* 1. Best Option */}
+    <div className="panel">
+      <h3>Best Option Trade</h3>
+      {bestOpt ? (<>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <div>
+            <span style={{ fontSize: 18, fontWeight: 700 }}>{bestOpt.symbol}</span>
+            <span className={`seg-action ${bestOpt.action}`} style={{ marginLeft: 8 }}>{bestOpt.action}</span>
+          </div>
+          <div className={`seg-conf-val ${bestOpt.confidence >= 70 ? 'high' : bestOpt.confidence >= 45 ? 'mid' : 'low'}`}>
+            {bestOpt.confidence}%
+          </div>
+        </div>
+        <div className="seg-meta">
+          <span>Entry <b>{fmt(bestOpt.entry)}</b></span>
+          <span>SL <b>{fmt(bestOpt.stop)}</b></span>
+          <span>TGT <b>{fmt(bestOpt.target)}</b></span>
+          <span>R:R <b>{bestOpt.reward_risk}:1</b></span>
+        </div>
+        {bestOpt.reason && <div className="mut" style={{ marginTop: 4 }}>{bestOpt.reason}</div>}
+        <button className="take-trade-btn" style={{ marginTop: 10 }} onClick={() => placeTrade(
+          bestOpt.spec || { segment: 'options', underlying: bestOpt.symbol?.includes('BANKNIFTY') ? 'BANKNIFTY' : 'NIFTY',
+            leg: bestOpt.action === 'sell' ? 'PE' : 'CE' }
+        )}>
+          {bestOpt.action === 'sell' ? 'Buy PE' : 'Buy CE'} — Execute Now
+        </button>
+      </>) : !loading && <div className="mut">No option trade available right now</div>}
+    </div>
+
+    {/* 2. Best Intraday Equity */}
+    <div className="panel">
+      <h3>Best Intraday Equity</h3>
+      {bestEq ? (<>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <div>
+            <span style={{ fontSize: 18, fontWeight: 700 }}>{bestEq.symbol}</span>
+            <span className={`seg-action ${bestEq.action}`} style={{ marginLeft: 8 }}>{bestEq.action}</span>
+          </div>
+          <div className={`seg-conf-val ${bestEq.confidence >= 70 ? 'high' : bestEq.confidence >= 45 ? 'mid' : 'low'}`}>
+            {bestEq.confidence}%
+          </div>
+        </div>
+        <div className="seg-meta">
+          <span>Entry <b>{fmt(bestEq.entry)}</b></span>
+          <span>SL <b>{fmt(bestEq.stop)}</b></span>
+          <span>TGT <b>{fmt(bestEq.target)}</b></span>
+          <span>R:R <b>{bestEq.reward_risk}:1</b></span>
+        </div>
+        {bestEq.reason && <div className="mut" style={{ marginTop: 4 }}>{bestEq.reason}</div>}
+        <button className="take-trade-btn" style={{ marginTop: 10 }} onClick={() => placeTrade(
+          bestEq.spec || { segment: 'equity', symbol: bestEq.symbol, side: bestEq.action === 'sell' ? 'short' : 'long' }
+        )}>
+          {bestEq.action === 'sell' ? 'Sell Short' : 'Buy Long'} — Execute Now
+        </button>
+      </>) : eqPick ? (<>
+        <div className="answer">{eqPick.answer}</div>
+        {eqPick.spec && <button className="take-trade-btn" style={{ marginTop: 10 }} onClick={() => placeTrade(eqPick.spec)}>
+          Execute Now
+        </button>}
+      </>) : !loading && <div className="mut">No intraday equity trade available right now</div>}
+    </div>
+
+    {/* 3. Best Swing */}
+    <div className="panel">
+      <h3>Best Swing Trade</h3>
+      {bestSwing ? (<>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <div>
+            <span style={{ fontSize: 18, fontWeight: 700 }}>{bestSwing.symbol}</span>
+            <span className={`seg-action ${bestSwing.action}`} style={{ marginLeft: 8 }}>{bestSwing.action}</span>
+          </div>
+          <div className={`seg-conf-val ${bestSwing.confidence >= 70 ? 'high' : bestSwing.confidence >= 45 ? 'mid' : 'low'}`}>
+            {bestSwing.confidence}%
+          </div>
+        </div>
+        <div className="seg-meta">
+          <span>Entry <b>{fmt(bestSwing.entry)}</b></span>
+          <span>SL <b>{fmt(bestSwing.stop)}</b></span>
+          <span>TGT <b>{fmt(bestSwing.target)}</b></span>
+          <span>R:R <b>{bestSwing.reward_risk}:1</b></span>
+        </div>
+        {bestSwing.reason && <div className="mut" style={{ marginTop: 4 }}>{bestSwing.reason}</div>}
+        <button className="take-trade-btn" style={{ marginTop: 10 }} onClick={() => placeTrade(
+          bestSwing.spec || { segment: 'equity', symbol: bestSwing.symbol, side: bestSwing.action === 'sell' ? 'short' : 'long' }
+        )}>
+          {bestSwing.action === 'sell' ? 'Sell Short' : 'Buy Long'} — Execute Now
+        </button>
+      </>) : !loading && <div className="mut">No swing setup available right now</div>}
+    </div>
+
     <div className="panel"><h3>Open positions</h3><Positions trades={data?.open_trades} refresh={refresh} /></div>
   </>
 }
@@ -710,12 +809,6 @@ const NAV = [
   { group: 'Forex (Beta)' },
   { id: 'forex-dashboard', label: 'Forex Dashboard' },
   { id: 'forex', label: 'Trade Forex', sub: true },
-  { group: 'Intelligence' },
-  { id: 'regime', label: 'Market Regime' },
-  { id: 'psychology', label: 'Risk & Psychology' },
-  { id: 'paper', label: 'Paper Trading' },
-  { id: 'journal', label: 'Trade Journal' },
-  { id: 'research', label: 'Research Lab' },
   { group: 'Tools' },
   { id: 'reco', label: 'Best Recommendation' },
   { id: 'ask', label: 'Ask AI' },
@@ -898,11 +991,6 @@ export default function App() {
       {view === 'portfolio' && <Portfolio />}
       {view === 'forex-dashboard' && <ForexBetaDashboard />}
       {view === 'forex' && <ForexView />}
-      {view === 'regime' && <RegimeMonitor />}
-      {view === 'psychology' && <PsychologyDashboard />}
-      {view === 'paper' && <PaperTrading />}
-      {view === 'journal' && <ReflectionLab />}
-      {view === 'research' && <QuantLab />}
       {view === 'reco' && <RecoView />}
       {view === 'ask' && <AskView />}
       {view === 'history' && <HistoryView />}
