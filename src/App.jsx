@@ -7,6 +7,10 @@ import OptionsHub from './components/OptionsHub.jsx'
 import EquityHub from './components/EquityHub.jsx'
 import SwingHub from './components/SwingHub.jsx'
 import Portfolio from './components/Portfolio.jsx'
+import DailyBrief from './components/DailyBrief.jsx'
+import RiskDashboard from './components/RiskDashboard.jsx'
+import Performance from './components/Performance.jsx'
+import Alerts from './components/Alerts.jsx'
 
 const fmt = (n) => n == null ? '–' : '₹' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 })
 const fmtUsd = (n) => n == null ? '–' : '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 })
@@ -800,12 +804,17 @@ function SettingsView({ tradingMode, setTradingMode }) {
 
 // ── sidebar / shell / auth ──
 const NAV = [
+  { group: 'Portfolio Intelligence' },
+  { id: 'brief', label: 'Daily Brief' },
+  { id: 'risk', label: 'Risk Dashboard' },
+  { id: 'performance', label: 'Performance' },
+  { id: 'alerts', label: 'Alerts' },
   { group: 'Indian Market' },
   { id: 'options', label: 'Options' },
   { id: 'equity', label: 'Intraday Equity' },
   { id: 'swing', label: 'Swing Trades' },
   { id: 'futures', label: 'Futures (Beta)', sub: true },
-  { id: 'portfolio', label: 'Portfolio' },
+  { id: 'portfolio', label: 'Capital & Positions' },
   { group: 'Forex (Beta)' },
   { id: 'forex-dashboard', label: 'Forex Dashboard' },
   { id: 'forex', label: 'Trade Forex', sub: true },
@@ -954,7 +963,7 @@ function AuthGate({ onAuth }) {
 
 export default function App() {
   const [user, setUser] = useState(null)
-  const [view, setView] = useState('options')
+  const [view, setView] = useState('brief')
   const [booting, setBooting] = useState(true)
   const [tradingMode, setTradingMode] = useState('paper')
   const [explainRec, setExplainRec] = useState(null)
@@ -976,7 +985,7 @@ export default function App() {
 
   if (booting) return <div className="authwrap"><div className="mut">Loading...</div></div>
   if (!user) return <AuthGate onAuth={(u) => {
-    setUser(u); setView('options')
+    setUser(u); setView('brief')
     apiGet('/me/trading-mode').then(r => setTradingMode(r.trading_mode || 'paper')).catch(() => {})
   }} />
 
@@ -984,6 +993,10 @@ export default function App() {
     <Sidebar user={user} view={view} setView={setView} onLogout={logout} tradingMode={tradingMode} />
     <main className="main">
       <RegimeStrip />
+      {view === 'brief' && <DailyBrief />}
+      {view === 'risk' && <RiskDashboard />}
+      {view === 'performance' && <Performance />}
+      {view === 'alerts' && <Alerts />}
       {view === 'options' && <OptionsHub onExplain={setExplainRec} />}
       {view === 'equity' && <EquityHub onExplain={setExplainRec} />}
       {view === 'swing' && <SwingHub onExplain={setExplainRec} />}
