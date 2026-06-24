@@ -1,10 +1,53 @@
-import { useState, useEffect, useCallback } from 'react'
-import { apiGet, apiPost } from '../api'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { apiGet, apiPost, getToken, API } from '../api'
 
 const fmt = (n) => n == null ? '-' : '₹' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 })
 const pct = (n) => n == null ? '-' : n.toFixed(1) + '%'
 
 const STATE_COLORS = { normal: '#22c55e', caution: '#f59e0b', restricted: '#f97316', halt: '#ef4444' }
+
+function useLiveStream() {
+  const [snapshot, setSnapshot] = useState(null)
+  const wsRef = useRef(null)
+  const reconnectRef = useRef(null)
+  useEffect(() => {
+    function connect() {
+      const tok = getToken()
+      if (!tok) return
+      const proto = API.startsWith('https') ? 'wss' : 'ws'
+      const host = API.replace(/^https?:\/\//, '')
+      const url = `${proto}://${host}/ws/live?token=${encodeURIComponent(tok)}`
+      const ws = new WebSocket(url)
+      wsRef.current = ws
+      ws.onmessage = (e) => { try { setSnapshot(JSON.parse(e.data)) } catch {} }
+      ws.onclose = () => { reconnectRef.current = setTimeout(connect, 5000) }
+      ws.onerror = () => { ws.close() }
+    }
+    connect()
+    return () => { clearTimeout(reconnectRef.current); wsRef.current?.close() }
+  }, [])
+  return snapshot
+}
+
+function PnlMiniChart({ series }) {
+  if (!series || series.length < 2) return null
+  const w = 500, h = 80, pad = 20
+  const pnls = series.map(s => s[2])
+  const lo = Math.min(0, ...pnls), hi = Math.max(0, ...pnls)
+  const span = hi - lo || 1
+  const xp = (i) => pad + (i / (series.length - 1)) * (w - 2 * pad)
+  const yp = (v) => h - pad - ((v - lo) / span) * (h - 2 * pad)
+  const path = series.map((s, i) => `${i ? 'L' : 'M'}${xp(i).toFixed(1)},${yp(s[2]).toFixed(1)}`).join(' ')
+  const last = pnls[pnls.length - 1]
+  const col = last >= 0 ? '#22c55e' : '#ef4444'
+  return <svg className="chart" viewBox={`0 0 ${w} ${h}`} style={{ height: 80, marginTop: 4 }}>
+    <line x1={pad} x2={w - pad} y1={yp(0)} y2={yp(0)} stroke="#2a3446" strokeDasharray="4 4" />
+    <path d={`${path} L${xp(series.length - 1)},${yp(0)} L${xp(0)},${yp(0)} Z`} fill={col} opacity="0.12" />
+    <path d={path} fill="none" stroke={col} strokeWidth="2" />
+    <circle cx={xp(series.length - 1)} cy={yp(last)} r="3" fill={col} />
+    <text x={w - pad} y={14} fill={col} fontSize="12" textAnchor="end" fontWeight="600">{fmt(last)}</text>
+  </svg>
+}
 
 function EquityCurveChart({ data }) {
   if (!data || data.length < 2) return null
@@ -47,6 +90,7 @@ export default function Portfolio() {
   const [curve, setCurve] = useState(null)
   const [days, setDays] = useState(30)
   const [models, setModels] = useState(null)
+  const live = useLiveStream()
 
   const load = useCallback(async () => {
     try {
@@ -257,22 +301,40 @@ export default function Portfolio() {
         </div>
       )}
 
-      {/* Open positions */}
+      {/* Live equity from WebSocket */}
+      {live && (
+        <div className="cards" style={{ marginBottom: 16 }}>
+          <div className="c">
+            <div className="k">Live Equity</div>
+            <div className="v">{fmt(live.live_equity)}</div>
+          </div>
+          <div className="c">
+            <div className="k">Unrealized P&L</div>
+            <div className={'v ' + ((live.unrealized || 0) >= 0 ? 'ok' : 'err')}>
+              {fmt(live.unrealized)}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Open positions with real-time P&L charts */}
       <div className="c">
         <div className="k">Open Positions ({positions.length})</div>
         {positions.length === 0 ? (
           <div className="mut" style={{ marginTop: 8 }}>No open positions.</div>
-        ) : (
+        ) : (<>
           <table className="hist" style={{ marginTop: 8 }}>
             <thead>
-              <tr><th>Instrument</th><th>Qty</th><th>Entry</th><th>SL / Tgt</th><th>P&L</th><th></th></tr>
+              <tr><th>Instrument</th><th>Qty</th><th>Entry</th><th>LTP</th><th>SL / Tgt</th><th>P&L</th><th></th></tr>
             </thead>
             <tbody>{positions.map((t) => {
               const last = t.pnl_series?.length ? t.pnl_series[t.pnl_series.length - 1] : null
+              const ltp = last ? last[1] : t.entry
               const pnl = last ? last[2] : 0
               return <tr key={t.id}>
                 <td>{t.symbol}<div className="mut">{t.segment} · {t.side}</div></td>
                 <td>{t.qty}</td><td>{fmt(t.entry)}</td>
+                <td>{fmt(ltp)}</td>
                 <td>{fmt(t.stop)} / {fmt(t.target)}</td>
                 <td className={pnl >= 0 ? 'ok' : 'err'}>{fmt(pnl)}</td>
                 <td><button className="mini" onClick={async () => {
@@ -281,7 +343,13 @@ export default function Portfolio() {
               </tr>
             })}</tbody>
           </table>
-        )}
+          {positions.map(t => t.pnl_series?.length > 1 && (
+            <div key={t.id + '-chart'} style={{ marginTop: 8 }}>
+              <div style={{ fontSize: 11, opacity: 0.5, marginBottom: 2 }}>{t.symbol} P&L</div>
+              <PnlMiniChart series={t.pnl_series} />
+            </div>
+          ))}
+        </>)}
       </div>
 
       {/* ML Models */}
