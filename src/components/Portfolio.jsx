@@ -1,10 +1,36 @@
 import { useState, useEffect, useCallback } from 'react'
 import { apiGet, apiPost } from '../api'
 
-const fmt = (n) => n == null ? '–' : '₹' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 })
+const fmt = (n) => n == null ? '-' : '₹' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 })
+const pct = (n) => n == null ? '-' : n.toFixed(1) + '%'
 
-const STATE_COLORS = {
-  normal: '#22c55e', caution: '#f59e0b', restricted: '#f97316', halt: '#ef4444',
+const STATE_COLORS = { normal: '#22c55e', caution: '#f59e0b', restricted: '#f97316', halt: '#ef4444' }
+
+function EquityCurveChart({ data }) {
+  if (!data || data.length < 2) return null
+  const w = 600, h = 160, pad = 40
+  const vals = data.map(d => d.cumulative ?? d.cumulative_pnl ?? 0)
+  const lo = Math.min(0, ...vals), hi = Math.max(0, ...vals)
+  const span = hi - lo || 1
+  const xp = (i) => pad + (i / (data.length - 1)) * (w - 2 * pad)
+  const yp = (v) => h - pad - ((v - lo) / span) * (h - 2 * pad)
+  const path = data.map((d, i) => {
+    const v = d.cumulative ?? d.cumulative_pnl ?? 0
+    return `${i ? 'L' : 'M'}${xp(i).toFixed(1)},${yp(v).toFixed(1)}`
+  }).join(' ')
+  const last = vals[vals.length - 1]
+  const col = last >= 0 ? '#22c55e' : '#ef4444'
+  return (
+    <svg className="chart" viewBox={`0 0 ${w} ${h}`} style={{ height: 160 }}>
+      <line x1={pad} x2={w - pad} y1={yp(0)} y2={yp(0)} stroke="#2a3446" strokeDasharray="4 4" />
+      <path d={`${path} L${xp(data.length - 1)},${yp(0)} L${xp(0)},${yp(0)} Z`} fill={col} opacity="0.1" />
+      <path d={path} fill="none" stroke={col} strokeWidth="2" />
+      <circle cx={xp(data.length - 1)} cy={yp(last)} r="3" fill={col} />
+      <text x={w - pad} y={14} fill={col} fontSize="12" textAnchor="end" fontWeight="600">{fmt(last)}</text>
+      <text x={pad} y={h - 8} fill="#8b97a8" fontSize="10">{data[0]?.date}</text>
+      <text x={w - pad} y={h - 8} fill="#8b97a8" fontSize="10" textAnchor="end">{data[data.length - 1]?.date}</text>
+    </svg>
+  )
 }
 
 export default function Portfolio() {
@@ -17,24 +43,31 @@ export default function Portfolio() {
   const [autoOpened, setAutoOpened] = useState(null)
   const [dep, setDep] = useState('')
   const [positions, setPositions] = useState([])
+  const [perf, setPerf] = useState(null)
+  const [curve, setCurve] = useState(null)
+  const [days, setDays] = useState(30)
+  const [models, setModels] = useState(null)
 
   const load = useCallback(async () => {
     try {
-      const [w, alloc, p] = await Promise.all([
+      const [w, alloc, p, pf, cv, m] = await Promise.all([
         apiGet('/me/wallet'),
         apiGet('/recommendations/allocate').catch(() => null),
         apiGet('/phase2/psychology').catch(() => null),
+        apiGet(`/portfolio/performance?days=${days}`).catch(() => null),
+        apiGet(`/portfolio/equity-curve?days=${days * 3}`).catch(() => null),
+        apiGet('/portfolio/models').catch(() => null),
       ])
       setWallet(w)
       setPositions((w?.open_trades || []).filter(t => t.segment !== 'forex'))
       if (w?.indian_trade_mode) setIndianMode(w.indian_trade_mode)
-      if (alloc) {
-        setAllocation(alloc.allocation)
-        setAllocBalance(alloc.balance)
-      }
+      if (alloc) { setAllocation(alloc.allocation); setAllocBalance(alloc.balance) }
       if (p) setPsych(p)
+      setPerf(pf)
+      setCurve(cv?.curve || [])
+      if (m) setModels(m)
     } catch {}
-  }, [])
+  }, [days])
 
   useEffect(() => { load(); const t = setInterval(load, 15000); return () => clearInterval(t) }, [load])
 
@@ -51,14 +84,12 @@ export default function Portfolio() {
   const riskColor = STATE_COLORS[riskState] || '#9ca3af'
   const psychScore = psych?.state?.psychology_score ?? 100
   const disciplineScore = psych?.state?.discipline_score ?? 100
-
   const segs = ['equity_intraday', 'options', 'swing']
   const segLabels = { equity_intraday: 'Equity', options: 'Options', swing: 'Swing' }
 
   return (
     <div style={{ padding: 16 }}>
-      <h2>Portfolio</h2>
-      <div className="crumb">Capital management — ML or manual mode with psychology-aware sizing</div>
+      <h2>Positions & Capital</h2>
 
       {/* Trading mode toggle */}
       <div className="c" style={{ marginBottom: 16 }}>
@@ -74,9 +105,9 @@ export default function Portfolio() {
           </button>
         </div>
         {indianMode === 'ml' && <div className="mode-info" style={{ marginTop: 8 }}>
-          Auto-trades Indian market during 9:15–15:15 IST. Picks best option/future, manages SL & target.
+          Auto-trades Indian market during 9:15-15:15 IST. Picks best option/future, manages SL & target.
         </div>}
-        {autoOpened && autoOpened.length > 0 && <div className="auto-opened-feedback" style={{ marginTop: 8 }}>
+        {autoOpened && autoOpened.length > 0 && <div style={{ marginTop: 8 }}>
           {autoOpened.map((a, i) => <div key={i} className={'auto-msg ' + (a.error ? 'err' : a.trade ? 'ok' : '')}>
             {a.trade ? `Opened ${a.symbol} (${a.trade.side})` :
              a.error ? `Error: ${a.error}` : a.info || 'No trade available'}
@@ -84,9 +115,8 @@ export default function Portfolio() {
         </div>}
       </div>
 
-      {/* Wallet + Psychology side by side */}
+      {/* Wallet + Psychology */}
       <div style={{ display: 'flex', gap: 16, marginBottom: 16, flexWrap: 'wrap' }}>
-        {/* Wallet */}
         <div className="c" style={{ flex: 2, minWidth: 250 }}>
           <div className="k">Capital</div>
           {wallet ? (
@@ -105,9 +135,8 @@ export default function Portfolio() {
                 </div>
               </div>
               <div style={{ display: 'flex', gap: 8, marginTop: 12, alignItems: 'center' }}>
-                <input type="number" placeholder="Add paper funds (INR)" value={dep}
-                  onChange={(e) => setDep(e.target.value)}
-                  style={{ flex: 1, fontSize: 12 }} />
+                <input type="number" placeholder="Add paper funds (max 1,00,000)" value={dep}
+                  onChange={(e) => setDep(e.target.value)} style={{ flex: 1, fontSize: 12 }} />
                 <button className="mini" disabled={!dep} onClick={async () => {
                   await apiPost('/me/wallet/deposit', { amount: Number(dep) })
                   setDep(''); load()
@@ -116,8 +145,6 @@ export default function Portfolio() {
             </>
           ) : <div className="mut">Loading...</div>}
         </div>
-
-        {/* Psychology state */}
         <div className="c" style={{ flex: 1, minWidth: 200 }}>
           <div className="k">Risk State</div>
           <div style={{ marginTop: 8 }}>
@@ -134,6 +161,73 @@ export default function Portfolio() {
           </div>
         </div>
       </div>
+
+      {/* Equity Curve */}
+      {curve && curve.length > 1 && (
+        <div className="panel">
+          <h3>Equity Curve</h3>
+          <EquityCurveChart data={curve.map(c => ({ ...c, cumulative: c.cumulative_pnl ?? c.cumulative ?? 0 }))} />
+        </div>
+      )}
+      {perf?.equity_curve && perf.equity_curve.length > 1 && (!curve || curve.length < 2) && (
+        <div className="panel">
+          <h3>Equity Curve</h3>
+          <EquityCurveChart data={perf.equity_curve} />
+        </div>
+      )}
+
+      {/* Performance metrics */}
+      {perf && !perf.message && (
+        <div className="panel">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <h3 style={{ margin: 0 }}>Performance</h3>
+            <div className="row" style={{ gap: 4 }}>
+              {[7, 30, 60, 90].map(d => (
+                <button key={d} className={'tab' + (days === d ? ' on' : '')} onClick={() => setDays(d)}>{d}d</button>
+              ))}
+            </div>
+          </div>
+          <div className="cards" style={{ marginTop: 0 }}>
+            <div className="c">
+              <div className="k">Total P&L</div>
+              <div className={'v ' + ((perf.total_pnl || 0) >= 0 ? 'ok' : 'err')}>{fmt(perf.total_pnl)}</div>
+            </div>
+            <div className="c">
+              <div className="k">Win Rate</div>
+              <div className={'v ' + ((perf.win_rate || 0) >= 60 ? 'ok' : 'err')}>{pct(perf.win_rate)}</div>
+            </div>
+            <div className="c">
+              <div className="k">Trades</div>
+              <div className="v">{perf.total_trades}</div>
+            </div>
+            <div className="c">
+              <div className="k">All-Time P&L</div>
+              <div className={'v ' + ((perf.all_time?.total_pnl || 0) >= 0 ? 'ok' : 'err')}>
+                {fmt(perf.all_time?.total_pnl)}
+              </div>
+            </div>
+          </div>
+
+          {perf.by_segment && Object.keys(perf.by_segment).length > 0 && (
+            <table className="hist" style={{ marginTop: 12 }}>
+              <thead>
+                <tr><th>Segment</th><th>Trades</th><th>Win Rate</th><th>P&L</th><th>PF</th></tr>
+              </thead>
+              <tbody>
+                {Object.entries(perf.by_segment).map(([seg, s]) => (
+                  <tr key={seg}>
+                    <td><span className={'seg-label ' + seg}>{seg}</span></td>
+                    <td>{s.trades}</td>
+                    <td className={(s.win_rate || 0) >= 60 ? 'ok' : 'err'}>{pct(s.win_rate)}</td>
+                    <td className={(s.pnl || 0) >= 0 ? 'ok' : 'err'}>{fmt(s.pnl)}</td>
+                    <td>{s.profit_factor}x</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
 
       {/* Capital allocation */}
       {allocation && (
@@ -189,6 +283,29 @@ export default function Portfolio() {
           </table>
         )}
       </div>
+
+      {/* ML Models */}
+      {models && (
+        <div className="panel" style={{ marginTop: 16 }}>
+          <h3>ML Models</h3>
+          <div className="models-grid">
+            {Object.entries(models.models || {}).map(([name, info]) => (
+              <div key={name} className="model-card">
+                <div className="model-name">{name.replace(/_/g, ' ')}</div>
+                <div className={'model-status ' + (info.status === 'active' ? 'ok' : 'err')}>{info.status}</div>
+                {info.backtest_win_rate && (
+                  <div className="model-detail">
+                    {Object.entries(info.backtest_win_rate).map(([k, v]) => (
+                      <span key={k}>{k}: {v}%</span>
+                    ))}
+                  </div>
+                )}
+                {info.win_rate && <div className="model-detail">Win: {info.win_rate}%</div>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

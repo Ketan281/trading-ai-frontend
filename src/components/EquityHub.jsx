@@ -10,6 +10,7 @@ export default function EquityHub({ onExplain }) {
   const [best, setBest] = useState(null)
   const [eqReco, setEqReco] = useState(null)
   const [screenerPicks, setScreenerPicks] = useState([])
+  const [mlEquity, setMlEquity] = useState([])
   const [loading, setLoading] = useState(true)
   const [sym, setSym] = useState('RELIANCE')
   const [qty, setQty] = useState('')
@@ -19,11 +20,12 @@ export default function EquityHub({ onExplain }) {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const [reco, eqR, wallet, p2] = await Promise.all([
+      const [reco, eqR, wallet, p2, mlEq] = await Promise.all([
         apiGet('/recommendations'),
         apiGet('/equity/recommendation').catch(() => null),
         apiGet('/me/wallet'),
         apiGet('/phase2/recommendations').catch(() => null),
+        apiGet('/ml/intraday/equity').catch(() => null),
       ])
       setPicks(reco?.equity_intraday || [])
       setBest(reco?.best_per_segment?.equity_intraday || null)
@@ -34,6 +36,8 @@ export default function EquityHub({ onExplain }) {
         setEqReco(eqR.recommendation || null)
         setScreenerPicks(eqR.screener_picks || [])
       }
+
+      if (mlEq?.trades) setMlEquity(mlEq.trades)
 
       if (p2?.recommendations) {
         const eqRecs = p2.recommendations.filter(r =>
@@ -115,6 +119,31 @@ export default function EquityHub({ onExplain }) {
             onClick={() => trade(best.action === 'sell' ? 'short' : 'long', best.symbol)}>
             Execute This Trade
           </button>
+        </div>
+      )}
+
+      {/* ML Intraday Equity */}
+      {mlEquity.length > 0 && (
+        <div style={{ marginBottom: 16 }}>
+          <h3 style={{ fontSize: 14, marginBottom: 8 }}>ML Intraday Equity ({mlEquity.length})</h3>
+          {mlEquity.map((t, i) => (
+            <div key={i} className="c" style={{ marginBottom: 8, borderLeft: '3px solid #8b5cf6' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontWeight: 700 }}>{t.symbol}</span>
+                <span style={{ color: '#8b5cf6', fontWeight: 600, fontSize: 12 }}>
+                  {t.confidence ? `${(t.confidence * 100).toFixed(0)}%` : ''} ML
+                </span>
+              </div>
+              <div style={{ fontSize: 12, display: 'flex', gap: 12, marginTop: 4, flexWrap: 'wrap' }}>
+                {t.entry && <span>Entry <b>{fmt(t.entry)}</b></span>}
+                {t.stop && <span>SL <b>{fmt(t.stop)}</b></span>}
+                {t.target && <span>TGT <b>{fmt(t.target)}</b></span>}
+                <span className={t.side === 'long' ? 'ok' : 'err'}>{t.side}</span>
+              </div>
+              <button className="take-trade-btn" onClick={() => trade(t.side || 'long', t.symbol, t.qty)}
+                style={{ marginTop: 6 }}>Execute</button>
+            </div>
+          ))}
         </div>
       )}
 

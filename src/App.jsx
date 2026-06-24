@@ -8,9 +8,6 @@ import EquityHub from './components/EquityHub.jsx'
 import SwingHub from './components/SwingHub.jsx'
 import Portfolio from './components/Portfolio.jsx'
 import DailyBrief from './components/DailyBrief.jsx'
-import RiskDashboard from './components/RiskDashboard.jsx'
-import Performance from './components/Performance.jsx'
-import Alerts from './components/Alerts.jsx'
 
 const fmt = (n) => n == null ? '–' : '₹' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 })
 const fmtUsd = (n) => n == null ? '–' : '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 })
@@ -95,7 +92,7 @@ function WalletPanel({ wallet, refresh }) {
       <Card k="Realized P&L" v={fmt(w.realized_pnl)} />
     </div>
     <div className="box" style={{ marginTop: 10 }}>
-      <input type="number" placeholder="add paper funds (INR)" value={dep}
+      <input type="number" placeholder="add paper funds (max ₹1,00,000)" value={dep}
              onChange={(e) => setDep(e.target.value)} />
       <button disabled={!dep} onClick={async () => {
         const r = await apiPost('/me/wallet/deposit', { amount: Number(dep) })
@@ -804,24 +801,16 @@ function SettingsView({ tradingMode, setTradingMode }) {
 
 // ── sidebar / shell / auth ──
 const NAV = [
-  { group: 'Portfolio Intelligence' },
-  { id: 'brief', label: 'Daily Brief' },
-  { id: 'risk', label: 'Risk Dashboard' },
-  { id: 'performance', label: 'Performance' },
-  { id: 'alerts', label: 'Alerts' },
-  { group: 'Indian Market' },
+  { group: 'Dashboard' },
+  { id: 'brief', label: 'Home' },
+  { group: 'Trade' },
   { id: 'options', label: 'Options' },
-  { id: 'equity', label: 'Intraday Equity' },
-  { id: 'swing', label: 'Swing Trades' },
-  { id: 'futures', label: 'Futures (Beta)', sub: true },
-  { id: 'portfolio', label: 'Capital & Positions' },
-  { group: 'Forex (Beta)' },
-  { id: 'forex-dashboard', label: 'Forex Dashboard' },
-  { id: 'forex', label: 'Trade Forex', sub: true },
-  { group: 'Tools' },
-  { id: 'reco', label: 'Best Recommendation' },
-  { id: 'ask', label: 'Ask AI' },
-  { id: 'history', label: 'History' },
+  { id: 'equity', label: 'Equity Intraday' },
+  { id: 'swing', label: 'Swing' },
+  { group: 'Portfolio' },
+  { id: 'portfolio', label: 'Positions & Capital' },
+  { id: 'reco', label: 'Recommendations' },
+  { id: 'history', label: 'Trade History' },
   { id: 'settings', label: 'Settings' },
 ]
 
@@ -994,18 +983,11 @@ export default function App() {
     <main className="main">
       <RegimeStrip />
       {view === 'brief' && <DailyBrief />}
-      {view === 'risk' && <RiskDashboard />}
-      {view === 'performance' && <Performance />}
-      {view === 'alerts' && <Alerts />}
       {view === 'options' && <OptionsHub onExplain={setExplainRec} />}
       {view === 'equity' && <EquityHub onExplain={setExplainRec} />}
       {view === 'swing' && <SwingHub onExplain={setExplainRec} />}
-      {view === 'futures' && <FuturesView />}
       {view === 'portfolio' && <Portfolio />}
-      {view === 'forex-dashboard' && <ForexBetaDashboard />}
-      {view === 'forex' && <ForexView />}
       {view === 'reco' && <RecoView />}
-      {view === 'ask' && <AskView />}
       {view === 'history' && <HistoryView />}
       {view === 'settings' && <SettingsView tradingMode={tradingMode} setTradingMode={setTradingMode} />}
       {view === 'admin' && <AdminView user={user} />}

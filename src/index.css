@@ -450,3 +450,12 @@ button.mini.full:hover { color: var(--txt); border-color: var(--acc); }
 .alert-time { font-size: 11px; color: var(--mut); margin-left: auto; }
 .alert-title { font-size: 14px; font-weight: 600; }
 .alert-message { font-size: 12px; color: var(--mut); margin-top: 2px; }
+
+/* ── Home Dashboard ── */
+.home-alerts { margin-bottom: 16px; }
+.home-alert { display: flex; align-items: center; gap: 10px; padding: 8px 14px;
+  border-radius: 8px; margin-bottom: 6px; font-size: 12px;
+  background: var(--card); border: 1px solid var(--line); }
+.home-alert.critical { border-left: 3px solid var(--bad); }
+.home-alert.warning { border-left: 3px solid #f59e0b; }
+.home-alert.info { border-left: 3px solid var(--acc); }
