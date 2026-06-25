@@ -8,6 +8,7 @@ import EquityHub from './components/EquityHub.jsx'
 import SwingHub from './components/SwingHub.jsx'
 import Portfolio from './components/Portfolio.jsx'
 import DailyBrief from './components/DailyBrief.jsx'
+import AutoTrader from './components/AutoTrader.jsx'
 
 const fmt = (n) => n == null ? '–' : '₹' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 })
 const fmtUsd = (n) => n == null ? '–' : '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 })
@@ -804,6 +805,7 @@ const NAV = [
   { group: 'Dashboard' },
   { id: 'brief', label: 'Home' },
   { group: 'Trade' },
+  { id: 'auto', label: 'Auto Trader (ML)' },
   { id: 'options', label: 'Options' },
   { id: 'equity', label: 'Equity Intraday' },
   { id: 'swing', label: 'Swing' },
@@ -983,6 +985,7 @@ export default function App() {
     <main className="main">
       <RegimeStrip />
       {view === 'brief' && <DailyBrief />}
+      {view === 'auto' && <AutoTrader />}
       {view === 'options' && <OptionsHub onExplain={setExplainRec} />}
       {view === 'equity' && <EquityHub onExplain={setExplainRec} />}
       {view === 'swing' && <SwingHub onExplain={setExplainRec} />}
