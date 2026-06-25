@@ -5,8 +5,8 @@
     "semantic_hash": ""
   },
   "src/App.jsx": {
-    "mtime": 1782364437.4312053,
-    "ast_hash": "e8a7f5588c151459cadacac5dbc4c9a1",
+    "mtime": 1782367884.123885,
+    "ast_hash": "a1bf7468e224ecc1620e4b3e9753e163",
     "semantic_hash": ""
   },
   "src/CandleChart.jsx": {
@@ -85,13 +85,13 @@
     "semantic_hash": ""
   },
   "src/components/AutoTrader.jsx": {
-    "mtime": 1782364407.666758,
-    "ast_hash": "0b73ae3c7027047d5a491e9b2a29ca7e",
+    "mtime": 1782367877.0857735,
+    "ast_hash": "db9744c3c383638c0df006705e55b54b",
     "semantic_hash": ""
   },
   "src/components/DailyBrief.jsx": {
-    "mtime": 1782356697.9270058,
-    "ast_hash": "4aac2e782077e403025420c87aa31916",
+    "mtime": 1782367900.093795,
+    "ast_hash": "14a65f3a9cfdc4669ec49e59cafafefb",
     "semantic_hash": ""
   },
   "src/components/Performance.jsx": {

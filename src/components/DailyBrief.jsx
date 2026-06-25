@@ -8,6 +8,8 @@ const TIER_COLORS = {
   TIER_1A: '#22c55e', TIER_1B: '#86efac', TIER_2A: '#3b82f6',
   TIER_2B: '#60a5fa', TIER_2C: '#f59e0b', NO_TRADE: '#6b7280',
 }
+const WALL_TIER_COLORS = { 1: '#22c55e', 2: '#f59e0b', 3: '#6b7280' }
+const WALL_TIER_LABELS = { 1: 'FULL LOT', 2: 'HALF LOT', 3: 'QUARTER' }
 const STATE_COLORS = { normal: '#22c55e', caution: '#f59e0b', restricted: '#f97316', halt: '#ef4444' }
 
 export default function DailyBrief() {
@@ -19,21 +21,24 @@ export default function DailyBrief() {
   const [autoResult, setAutoResult] = useState(null)
   const [executing, setExecuting] = useState(false)
   const [autoDash, setAutoDash] = useState(null)
+  const [wallSignals, setWallSignals] = useState(null)
 
   const load = useCallback(async () => {
     try {
-      const [b, r, al, rg, ad] = await Promise.all([
+      const [b, r, al, rg, ad, ws] = await Promise.all([
         apiGet('/portfolio/brief'),
         apiGet('/portfolio/risk').catch(() => null),
         apiGet('/portfolio/alerts?unread_only=true').catch(() => ({ alerts: [] })),
         apiGet('/phase2/regime').catch(() => null),
         apiGet('/phase2/auto/dashboard').catch(() => null),
+        apiGet('/phase2/auto/wall-signals').catch(() => null),
       ])
       setBrief(b)
       setRisk(r)
       setAlerts((al?.alerts || []).slice(0, 5))
       setRegime(rg)
       if (ad && !ad.error) setAutoDash(ad)
+      if (ws && !ws.error) setWallSignals(ws)
     } catch {}
     finally { setLoading(false) }
   }, [])
@@ -216,44 +221,70 @@ export default function DailyBrief() {
         </div>
       )}
 
-      {/* Index Options Signals */}
-      <div className="panel">
-        <h3>Index Options Signals</h3>
-        <div className="brief-signals">
-          {idxSignals.length === 0 && <div className="mut">No index option signals loaded. Data collected during market hours.</div>}
-          {idxSignals.map((s, i) => (
-            <div key={i} className="signal-card" style={{ borderLeftColor: TIER_COLORS[s.tier] || '#333' }}>
-              <div className="signal-head">
-                <span className="signal-symbol">{s.symbol}</span>
-                {s.tier !== 'NO_TRADE' ? (
-                  <span className="signal-tier" style={{ color: TIER_COLORS[s.tier] }}>{s.tier}</span>
-                ) : (
-                  <span className="signal-tier skip">NO TRADE</span>
-                )}
+      {/* OI Wall Selling Signals (ML-trained, 71-89% win rate) */}
+      {wallSignals && (
+        <div className="panel">
+          <h3>OI Wall Selling Signals <span className="mut" style={{ fontWeight: 400, fontSize: 12 }}>ML-trained | 71-89% win rate</span></h3>
+          {['NIFTY', 'BANKNIFTY'].map(sym => {
+            const data = wallSignals.signals?.[sym]
+            if (!data) return null
+            if (data.status !== 'ok') return (
+              <div key={sym} style={{ marginBottom: 12 }}>
+                <div style={{ fontWeight: 700, marginBottom: 4 }}>{sym}</div>
+                <div className="mut">{data.status}: {data.reason || 'No signals'}</div>
               </div>
-              {s.tier !== 'NO_TRADE' && s.action !== 'NO_TRADE' ? (
-                <div className="signal-body">
-                  <div className="signal-dir">
-                    <span className={s.direction === 'BULLISH' ? 'ok' : 'err'}>{s.direction}</span>
-                    <span className="signal-wr">{s.win_rate_est}% win rate</span>
-                  </div>
-                  {s.contract && <div className="signal-contract">{s.contract}</div>}
-                  <div className="signal-levels">
-                    <span>Entry <b>{fmt(s.ltp)}</b></span>
-                    <span>Target <b>{fmt(s.target)}</b></span>
-                    <span>SL <b>{fmt(s.stoploss)}</b></span>
-                  </div>
-                  {s.oi_signal && <div className="signal-oi mut">
-                    OI: {s.oi_signal} {s.pcr && `| PCR: ${s.pcr}`} {s.rsi && `| RSI: ${s.rsi}`}
-                  </div>}
+            )
+            const sigs = (data.signals || []).filter(s => !s.signal?.includes('STRANGLE'))
+            return (
+              <div key={sym} style={{ marginBottom: 20 }}>
+                <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 8 }}>
+                  {sym} <span className="mut" style={{ fontWeight: 400 }}>Spot: {fmt(data.spot)}</span>
                 </div>
-              ) : (
-                <div className="signal-reason mut">{s.reason}</div>
-              )}
-            </div>
-          ))}
+                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                  {sigs.map((s, i) => (
+                    <div key={i} className="signal-card" style={{
+                      borderLeftColor: WALL_TIER_COLORS[s.tier] || '#333',
+                      flex: '1 1 280px', maxWidth: 400,
+                    }}>
+                      <div className="signal-head">
+                        <span className="signal-symbol">{s.signal}</span>
+                        {s.tradeable ? (
+                          <span className="signal-tier" style={{ color: WALL_TIER_COLORS[s.tier], fontSize: 11 }}>
+                            {WALL_TIER_LABELS[s.tier] || 'SKIP'}
+                          </span>
+                        ) : (
+                          <span className="signal-tier skip" style={{ fontSize: 11 }}>SKIP</span>
+                        )}
+                      </div>
+                      <div className="signal-body">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span className="ok" style={{ fontWeight: 700, fontSize: 18 }}>{s.win_pct}%</span>
+                          <span className="mut">win rate</span>
+                        </div>
+                        <div className="signal-levels" style={{ marginTop: 8 }}>
+                          <span>Sell <b>{fmt(s.premium)}</b></span>
+                          <span>Target <b>{fmt(s.target)}</b></span>
+                          <span>SL <b>{fmt(s.stoploss)}</b></span>
+                        </div>
+                        <div style={{ display: 'flex', gap: 12, marginTop: 8, fontSize: 11, opacity: 0.7 }}>
+                          <span>Funds: {fmt(s.funds_required)}</span>
+                          <span>Score: {s.score}</span>
+                          <span>Dist: {s.dist_pct?.toFixed(1)}%</span>
+                          <span>{s.lots} lot{s.lots > 1 ? 's' : ''}</span>
+                        </div>
+                        {s.oi_building && <div style={{ fontSize: 11, color: '#22c55e', marginTop: 4 }}>OI Building ↑</div>}
+                      </div>
+                    </div>
+                  ))}
+                  {sigs.length === 0 && (
+                    <div className="mut">No wall signals — walls too weak or too close to spot</div>
+                  )}
+                </div>
+              </div>
+            )
+          })}
         </div>
-      </div>
+      )}
 
       {/* Equity picks */}
       {brief.signals?.equity && brief.signals.equity.length > 0 && !brief.signals.equity[0]?.error && (

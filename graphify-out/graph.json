@@ -80,7 +80,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "src_app_uselivestream",
-      "community": 1,
+      "community": 3,
       "norm_label": "uselivestream()"
     },
     {
@@ -230,7 +230,7 @@
       "source_location": "L586",
       "_origin": "ast",
       "id": "src_app_forexbetadashboard",
-      "community": 1,
+      "community": 3,
       "norm_label": "forexbetadashboard()"
     },
     {
@@ -240,7 +240,7 @@
       "source_location": "L655",
       "_origin": "ast",
       "id": "src_app_settingsview",
-      "community": 3,
+      "community": 1,
       "norm_label": "settingsview()"
     },
     {
@@ -354,6 +354,66 @@
       "norm_label": "autotrader()"
     },
     {
+      "label": "DailyBrief.jsx",
+      "file_type": "code",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "components_dailybrief",
+      "community": 7,
+      "norm_label": "dailybrief.jsx"
+    },
+    {
+      "label": "fmt()",
+      "file_type": "code",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "components_dailybrief_fmt",
+      "community": 7,
+      "norm_label": "fmt()"
+    },
+    {
+      "label": "pct()",
+      "file_type": "code",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "components_dailybrief_pct",
+      "community": 7,
+      "norm_label": "pct()"
+    },
+    {
+      "label": "TIER_COLORS",
+      "file_type": "code",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "components_dailybrief_tier_colors",
+      "community": 7,
+      "norm_label": "tier_colors"
+    },
+    {
+      "label": "STATE_COLORS",
+      "file_type": "code",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "components_dailybrief_state_colors",
+      "community": 7,
+      "norm_label": "state_colors"
+    },
+    {
+      "label": "DailyBrief()",
+      "file_type": "code",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "components_dailybrief_dailybrief",
+      "community": 7,
+      "norm_label": "dailybrief()"
+    },
+    {
       "label": "api.js",
       "file_type": "code",
       "source_file": "src/api.js",
@@ -462,9 +522,9 @@
       "source_file": "src/App.jsx",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "components_autotrader",
-      "confidence_score": 1.0
+      "target": "components_autotrader"
     },
     {
       "relation": "imports",
@@ -473,8 +533,30 @@
       "source_file": "src/App.jsx",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_app",
-      "target": "components_autotrader_autotrader",
+      "target": "components_autotrader_autotrader"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "components_dailybrief",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "src_app",
+      "target": "components_dailybrief_dailybrief",
       "confidence_score": 1.0
     },
     {
@@ -1280,9 +1362,9 @@
       "source_file": "src/components/AutoTrader.jsx",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_autotrader",
-      "target": "components_autotrader_autotrader",
-      "confidence_score": 1.0
+      "target": "components_autotrader_autotrader"
     },
     {
       "relation": "contains",
@@ -1290,9 +1372,9 @@
       "source_file": "src/components/AutoTrader.jsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_autotrader",
-      "target": "components_autotrader_fmt",
-      "confidence_score": 1.0
+      "target": "components_autotrader_fmt"
     },
     {
       "relation": "contains",
@@ -1300,9 +1382,9 @@
       "source_file": "src/components/AutoTrader.jsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_autotrader",
-      "target": "components_autotrader_pct",
-      "confidence_score": 1.0
+      "target": "components_autotrader_pct"
     },
     {
       "relation": "contains",
@@ -1310,9 +1392,9 @@
       "source_file": "src/components/AutoTrader.jsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_autotrader",
-      "target": "components_autotrader_tier_colors",
-      "confidence_score": 1.0
+      "target": "components_autotrader_tier_colors"
     },
     {
       "relation": "contains",
@@ -1320,9 +1402,9 @@
       "source_file": "src/components/AutoTrader.jsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_autotrader",
-      "target": "components_autotrader_tier_labels",
-      "confidence_score": 1.0
+      "target": "components_autotrader_tier_labels"
     },
     {
       "relation": "imports",
@@ -1331,9 +1413,9 @@
       "source_file": "src/components/AutoTrader.jsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_autotrader",
-      "target": "src_api_apiget",
-      "confidence_score": 1.0
+      "target": "src_api_apiget"
     },
     {
       "relation": "imports",
@@ -1342,9 +1424,9 @@
       "source_file": "src/components/AutoTrader.jsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_autotrader",
-      "target": "src_api_apipost",
-      "confidence_score": 1.0
+      "target": "src_api_apipost"
     },
     {
       "relation": "calls",
@@ -1353,9 +1435,9 @@
       "source_file": "src/components/AutoTrader.jsx",
       "source_location": "L91",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_autotrader_autotrader",
-      "target": "components_autotrader_fmt",
-      "confidence_score": 1.0
+      "target": "components_autotrader_fmt"
     },
     {
       "relation": "calls",
@@ -1364,8 +1446,102 @@
       "source_file": "src/components/AutoTrader.jsx",
       "source_location": "L101",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_autotrader_autotrader",
-      "target": "components_autotrader_pct",
+      "target": "components_autotrader_pct"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "components_dailybrief",
+      "target": "components_dailybrief_dailybrief",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "components_dailybrief",
+      "target": "components_dailybrief_fmt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "components_dailybrief",
+      "target": "components_dailybrief_pct",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "components_dailybrief",
+      "target": "components_dailybrief_state_colors",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "components_dailybrief",
+      "target": "components_dailybrief_tier_colors",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "components_dailybrief",
+      "target": "src_api_apiget",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "components_dailybrief",
+      "target": "src_api_apipost",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L94",
+      "weight": 1.0,
+      "source": "components_dailybrief_dailybrief",
+      "target": "components_dailybrief_fmt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L137",
+      "weight": 1.0,
+      "source": "components_dailybrief_dailybrief",
+      "target": "components_dailybrief_pct",
       "confidence_score": 1.0
     },
     {
@@ -1526,5 +1702,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "c0da9d30b55d014d7466244c91eea1f3ab4c49b4"
+  "built_at_commit": "2cd9d38985bc0a6e4687dbb345d128aef471ff6b"
 }
