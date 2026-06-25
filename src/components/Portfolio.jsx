@@ -81,7 +81,7 @@ export default function Portfolio() {
   const [psych, setPsych] = useState(null)
   const [allocation, setAllocation] = useState(null)
   const [allocBalance, setAllocBalance] = useState(0)
-  const [indianMode, setIndianMode] = useState('custom')
+  const [indianMode, setIndianMode] = useState(() => localStorage.getItem('indianMode') || 'custom')
   const [toggling, setToggling] = useState(false)
   const [autoOpened, setAutoOpened] = useState(null)
   const [dep, setDep] = useState('')
@@ -104,7 +104,7 @@ export default function Portfolio() {
       ])
       setWallet(w)
       setPositions((w?.open_trades || []).filter(t => t.segment !== 'forex'))
-      if (w?.indian_trade_mode) setIndianMode(w.indian_trade_mode)
+      if (w?.indian_trade_mode) { setIndianMode(w.indian_trade_mode); localStorage.setItem('indianMode', w.indian_trade_mode) }
       if (alloc) { setAllocation(alloc.allocation); setAllocBalance(alloc.balance) }
       if (p) setPsych(p)
       setPerf(pf)
@@ -120,7 +120,7 @@ export default function Portfolio() {
     try {
       const r = await apiPost('/me/mode/indian', { mode })
       if (r.auto_opened) setAutoOpened(r.auto_opened)
-      setIndianMode(mode); load()
+      setIndianMode(mode); localStorage.setItem('indianMode', mode); load()
     } catch (e) { alert(e.message) } finally { setToggling(false) }
   }
 
@@ -179,12 +179,17 @@ export default function Portfolio() {
                 </div>
               </div>
               <div style={{ display: 'flex', gap: 8, marginTop: 12, alignItems: 'center' }}>
-                <input type="number" placeholder="Add paper funds (max 1,00,000)" value={dep}
+                <input type="number" placeholder="Add paper funds (max 1,00,00,000)" value={dep}
                   onChange={(e) => setDep(e.target.value)} style={{ flex: 1, fontSize: 12 }} />
                 <button className="mini" disabled={!dep} onClick={async () => {
                   await apiPost('/me/wallet/deposit', { amount: Number(dep) })
                   setDep(''); load()
                 }}>Add</button>
+                <button className="mini" style={{ opacity: 0.6 }} onClick={async () => {
+                  if (!confirm('Reset wallet to ₹10,00,000? All trades will be cleared.')) return
+                  await apiPost('/me/wallet/reset')
+                  load()
+                }}>Reset to ₹10L</button>
               </div>
             </>
           ) : <div className="mut">Loading...</div>}

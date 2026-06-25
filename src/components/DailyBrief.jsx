@@ -18,19 +18,22 @@ export default function DailyBrief() {
   const [loading, setLoading] = useState(true)
   const [autoResult, setAutoResult] = useState(null)
   const [executing, setExecuting] = useState(false)
+  const [autoDash, setAutoDash] = useState(null)
 
   const load = useCallback(async () => {
     try {
-      const [b, r, al, rg] = await Promise.all([
+      const [b, r, al, rg, ad] = await Promise.all([
         apiGet('/portfolio/brief'),
         apiGet('/portfolio/risk').catch(() => null),
         apiGet('/portfolio/alerts?unread_only=true').catch(() => ({ alerts: [] })),
         apiGet('/phase2/regime').catch(() => null),
+        apiGet('/phase2/auto/dashboard').catch(() => null),
       ])
       setBrief(b)
       setRisk(r)
       setAlerts((al?.alerts || []).slice(0, 5))
       setRegime(rg)
+      if (ad && !ad.error) setAutoDash(ad)
     } catch {}
     finally { setLoading(false) }
   }, [])
@@ -133,6 +136,83 @@ export default function DailyBrief() {
             <div className="k">Drawdown</div>
             <div className={'v ' + ((perf.drawdown_pct || 0) < -5 ? 'err' : 'ok')}>{pct(perf.drawdown_pct)}</div>
           </div>
+        </div>
+      )}
+
+      {/* Auto Trader (ML Mode) */}
+      {autoDash?.account && (
+        <div className="panel">
+          <h3>Auto Trader (ML Mode)</h3>
+          <div className="cards">
+            <div className="c">
+              <div className="k">Capital</div>
+              <div className="v">{fmt(autoDash.account.capital)}</div>
+            </div>
+            <div className="c">
+              <div className="k">Total P&L</div>
+              <div className={'v ' + ((autoDash.account.total_pnl || 0) >= 0 ? 'ok' : 'err')}>
+                {fmt(autoDash.account.total_pnl)} ({autoDash.account.return_pct}%)
+              </div>
+            </div>
+            <div className="c">
+              <div className="k">Win Rate</div>
+              <div className={'v ' + ((autoDash.account.win_rate || 0) >= 60 ? 'ok' : 'err')}>
+                {pct(autoDash.account.win_rate)}
+              </div>
+            </div>
+            <div className="c">
+              <div className="k">Trades</div>
+              <div className="v">{autoDash.account.total_trades} ({autoDash.account.wins}W / {autoDash.account.losses}L)</div>
+            </div>
+          </div>
+          {autoDash.account.profit_factor > 0 && (
+            <div style={{ display: 'flex', gap: 16, marginTop: 8, fontSize: 12 }}>
+              <span><span style={{ opacity: 0.5 }}>Profit Factor</span> {autoDash.account.profit_factor}x</span>
+              <span><span style={{ opacity: 0.5 }}>Max DD</span> {pct(autoDash.account.max_drawdown)}</span>
+              <span><span style={{ opacity: 0.5 }}>Deployed</span> {fmt(autoDash.account.deployed)}</span>
+            </div>
+          )}
+          {autoDash.open_trades?.length > 0 && (
+            <div style={{ marginTop: 12 }}>
+              <div className="k">Open Positions ({autoDash.open_trades.length})</div>
+              <table className="hist" style={{ marginTop: 4 }}>
+                <thead><tr><th>Symbol</th><th>Segment</th><th>Action</th><th>Entry</th><th>Qty</th><th>Score</th></tr></thead>
+                <tbody>
+                  {autoDash.open_trades.map((t, i) => (
+                    <tr key={i}>
+                      <td>{t.symbol}</td>
+                      <td><span className={'seg-label ' + t.segment}>{t.segment}</span></td>
+                      <td>{t.action}</td>
+                      <td>{fmt(t.entry)}</td>
+                      <td>{t.qty}</td>
+                      <td>{t.score}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          {autoDash.recent_trades?.length > 0 && (
+            <div style={{ marginTop: 12 }}>
+              <div className="k">Recent Trades</div>
+              <table className="hist" style={{ marginTop: 4 }}>
+                <thead><tr><th>Date</th><th>Symbol</th><th>Segment</th><th>Entry</th><th>Exit</th><th>P&L</th><th>Status</th></tr></thead>
+                <tbody>
+                  {autoDash.recent_trades.slice(0, 10).map((t, i) => (
+                    <tr key={i}>
+                      <td>{t.date}</td>
+                      <td>{t.symbol}</td>
+                      <td><span className={'seg-label ' + t.segment}>{t.segment}</span></td>
+                      <td>{fmt(t.entry)}</td>
+                      <td>{t.exit ? fmt(t.exit) : '-'}</td>
+                      <td className={t.pnl >= 0 ? 'ok' : 'err'}>{t.pnl != null ? fmt(t.pnl) : '-'}</td>
+                      <td><span className={'tag ' + t.status}>{t.status}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
 
