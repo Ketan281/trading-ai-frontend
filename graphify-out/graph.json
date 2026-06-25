@@ -4,356 +4,6 @@
   "graph": {},
   "nodes": [
     {
-      "label": "App.jsx",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "src_app",
-      "community": 0,
-      "norm_label": "app.jsx"
-    },
-    {
-      "label": "fmt()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L13",
-      "_origin": "ast",
-      "id": "src_app_fmt",
-      "community": 5,
-      "norm_label": "fmt()"
-    },
-    {
-      "label": "fmtUsd()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L14",
-      "_origin": "ast",
-      "id": "src_app_fmtusd",
-      "community": 6,
-      "norm_label": "fmtusd()"
-    },
-    {
-      "label": "fmtFx()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L15",
-      "_origin": "ast",
-      "id": "src_app_fmtfx",
-      "community": 0,
-      "norm_label": "fmtfx()"
-    },
-    {
-      "label": "fmtPnl()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L16",
-      "_origin": "ast",
-      "id": "src_app_fmtpnl",
-      "community": 0,
-      "norm_label": "fmtpnl()"
-    },
-    {
-      "label": "useWallet()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L19",
-      "_origin": "ast",
-      "id": "src_app_usewallet",
-      "community": 1,
-      "norm_label": "usewallet()"
-    },
-    {
-      "label": "useCandles()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L33",
-      "_origin": "ast",
-      "id": "src_app_usecandles",
-      "community": 1,
-      "norm_label": "usecandles()"
-    },
-    {
-      "label": "useLiveStream()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L51",
-      "_origin": "ast",
-      "id": "src_app_uselivestream",
-      "community": 3,
-      "norm_label": "uselivestream()"
-    },
-    {
-      "label": "Card()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L82",
-      "_origin": "ast",
-      "id": "src_app_card",
-      "community": 0,
-      "norm_label": "card()"
-    },
-    {
-      "label": "WalletPanel()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L85",
-      "_origin": "ast",
-      "id": "src_app_walletpanel",
-      "community": 5,
-      "norm_label": "walletpanel()"
-    },
-    {
-      "label": "ForexWalletPanel()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L107",
-      "_origin": "ast",
-      "id": "src_app_forexwalletpanel",
-      "community": 6,
-      "norm_label": "forexwalletpanel()"
-    },
-    {
-      "label": "LiveEquityBar()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L128",
-      "_origin": "ast",
-      "id": "src_app_liveequitybar",
-      "community": 5,
-      "norm_label": "liveequitybar()"
-    },
-    {
-      "label": "Positions()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L144",
-      "_origin": "ast",
-      "id": "src_app_positions",
-      "community": 3,
-      "norm_label": "positions()"
-    },
-    {
-      "label": "PnlMiniChart()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L167",
-      "_origin": "ast",
-      "id": "src_app_pnlminichart",
-      "community": 6,
-      "norm_label": "pnlminichart()"
-    },
-    {
-      "label": "TradeButtons()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L191",
-      "_origin": "ast",
-      "id": "src_app_tradebuttons",
-      "community": 0,
-      "norm_label": "tradebuttons()"
-    },
-    {
-      "label": "FuturesView()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L193",
-      "_origin": "ast",
-      "id": "src_app_futuresview",
-      "community": 1,
-      "norm_label": "futuresview()"
-    },
-    {
-      "label": "ForexView()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L224",
-      "_origin": "ast",
-      "id": "src_app_forexview",
-      "community": 6,
-      "norm_label": "forexview()"
-    },
-    {
-      "label": "RecoView()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L333",
-      "_origin": "ast",
-      "id": "src_app_recoview",
-      "community": 1,
-      "norm_label": "recoview()"
-    },
-    {
-      "label": "HistRow()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L467",
-      "_origin": "ast",
-      "id": "src_app_histrow",
-      "community": 5,
-      "norm_label": "histrow()"
-    },
-    {
-      "label": "HistoryView()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L493",
-      "_origin": "ast",
-      "id": "src_app_historyview",
-      "community": 1,
-      "norm_label": "historyview()"
-    },
-    {
-      "label": "AdminView()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L519",
-      "_origin": "ast",
-      "id": "src_app_adminview",
-      "community": 1,
-      "norm_label": "adminview()"
-    },
-    {
-      "label": "AskView()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L557",
-      "_origin": "ast",
-      "id": "src_app_askview",
-      "community": 3,
-      "norm_label": "askview()"
-    },
-    {
-      "label": "ForexBetaDashboard()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L586",
-      "_origin": "ast",
-      "id": "src_app_forexbetadashboard",
-      "community": 3,
-      "norm_label": "forexbetadashboard()"
-    },
-    {
-      "label": "SettingsView()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L655",
-      "_origin": "ast",
-      "id": "src_app_settingsview",
-      "community": 1,
-      "norm_label": "settingsview()"
-    },
-    {
-      "label": "NAV",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L804",
-      "_origin": "ast",
-      "id": "src_app_nav",
-      "community": 0,
-      "norm_label": "nav"
-    },
-    {
-      "label": "ChangePassword()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L819",
-      "_origin": "ast",
-      "id": "src_app_changepassword",
-      "community": 3,
-      "norm_label": "changepassword()"
-    },
-    {
-      "label": "Sidebar()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L836",
-      "_origin": "ast",
-      "id": "src_app_sidebar",
-      "community": 0,
-      "norm_label": "sidebar()"
-    },
-    {
-      "label": "AuthGate()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L865",
-      "_origin": "ast",
-      "id": "src_app_authgate",
-      "community": 3,
-      "norm_label": "authgate()"
-    },
-    {
-      "label": "App()",
-      "file_type": "code",
-      "source_file": "src/App.jsx",
-      "source_location": "L955",
-      "_origin": "ast",
-      "id": "src_app_app",
-      "community": 0,
-      "norm_label": "app()"
-    },
-    {
-      "label": "AutoTrader.jsx",
-      "file_type": "code",
-      "source_file": "src/components/AutoTrader.jsx",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "components_autotrader",
-      "community": 2,
-      "norm_label": "autotrader.jsx"
-    },
-    {
-      "label": "fmt()",
-      "file_type": "code",
-      "source_file": "src/components/AutoTrader.jsx",
-      "source_location": "L4",
-      "_origin": "ast",
-      "id": "components_autotrader_fmt",
-      "community": 2,
-      "norm_label": "fmt()"
-    },
-    {
-      "label": "pct()",
-      "file_type": "code",
-      "source_file": "src/components/AutoTrader.jsx",
-      "source_location": "L5",
-      "_origin": "ast",
-      "id": "components_autotrader_pct",
-      "community": 2,
-      "norm_label": "pct()"
-    },
-    {
-      "label": "TIER_COLORS",
-      "file_type": "code",
-      "source_file": "src/components/AutoTrader.jsx",
-      "source_location": "L7",
-      "_origin": "ast",
-      "id": "components_autotrader_tier_colors",
-      "community": 2,
-      "norm_label": "tier_colors"
-    },
-    {
-      "label": "TIER_LABELS",
-      "file_type": "code",
-      "source_file": "src/components/AutoTrader.jsx",
-      "source_location": "L8",
-      "_origin": "ast",
-      "id": "components_autotrader_tier_labels",
-      "community": 2,
-      "norm_label": "tier_labels"
-    },
-    {
-      "label": "AutoTrader()",
-      "file_type": "code",
-      "source_file": "src/components/AutoTrader.jsx",
-      "source_location": "L10",
-      "_origin": "ast",
-      "id": "components_autotrader_autotrader",
-      "community": 2,
-      "norm_label": "autotrader()"
-    },
-    {
       "label": "DailyBrief.jsx",
       "file_type": "code",
       "source_file": "src/components/DailyBrief.jsx",
@@ -394,10 +44,30 @@
       "norm_label": "tier_colors"
     },
     {
-      "label": "STATE_COLORS",
+      "label": "WALL_TIER_COLORS",
       "file_type": "code",
       "source_file": "src/components/DailyBrief.jsx",
       "source_location": "L11",
+      "_origin": "ast",
+      "id": "components_dailybrief_wall_tier_colors",
+      "community": 7,
+      "norm_label": "wall_tier_colors"
+    },
+    {
+      "label": "WALL_TIER_LABELS",
+      "file_type": "code",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "components_dailybrief_wall_tier_labels",
+      "community": 7,
+      "norm_label": "wall_tier_labels"
+    },
+    {
+      "label": "STATE_COLORS",
+      "file_type": "code",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L13",
       "_origin": "ast",
       "id": "components_dailybrief_state_colors",
       "community": 7,
@@ -407,11 +77,361 @@
       "label": "DailyBrief()",
       "file_type": "code",
       "source_file": "src/components/DailyBrief.jsx",
-      "source_location": "L13",
+      "source_location": "L15",
       "_origin": "ast",
       "id": "components_dailybrief_dailybrief",
       "community": 7,
       "norm_label": "dailybrief()"
+    },
+    {
+      "label": "App.jsx",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "app.jsx",
+      "id": "src_app"
+    },
+    {
+      "label": "fmt()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L13",
+      "_origin": "ast",
+      "community": 5,
+      "norm_label": "fmt()",
+      "id": "src_app_fmt"
+    },
+    {
+      "label": "fmtUsd()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L14",
+      "_origin": "ast",
+      "community": 5,
+      "norm_label": "fmtusd()",
+      "id": "src_app_fmtusd"
+    },
+    {
+      "label": "fmtFx()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L15",
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "fmtfx()",
+      "id": "src_app_fmtfx"
+    },
+    {
+      "label": "fmtPnl()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L16",
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "fmtpnl()",
+      "id": "src_app_fmtpnl"
+    },
+    {
+      "label": "useWallet()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L19",
+      "_origin": "ast",
+      "community": 1,
+      "norm_label": "usewallet()",
+      "id": "src_app_usewallet"
+    },
+    {
+      "label": "useCandles()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L33",
+      "_origin": "ast",
+      "community": 1,
+      "norm_label": "usecandles()",
+      "id": "src_app_usecandles"
+    },
+    {
+      "label": "useLiveStream()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L51",
+      "_origin": "ast",
+      "community": 4,
+      "norm_label": "uselivestream()",
+      "id": "src_app_uselivestream"
+    },
+    {
+      "label": "Card()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L82",
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "card()",
+      "id": "src_app_card"
+    },
+    {
+      "label": "WalletPanel()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L85",
+      "_origin": "ast",
+      "community": 5,
+      "norm_label": "walletpanel()",
+      "id": "src_app_walletpanel"
+    },
+    {
+      "label": "ForexWalletPanel()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L107",
+      "_origin": "ast",
+      "community": 5,
+      "norm_label": "forexwalletpanel()",
+      "id": "src_app_forexwalletpanel"
+    },
+    {
+      "label": "LiveEquityBar()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L128",
+      "_origin": "ast",
+      "community": 5,
+      "norm_label": "liveequitybar()",
+      "id": "src_app_liveequitybar"
+    },
+    {
+      "label": "Positions()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L144",
+      "_origin": "ast",
+      "community": 3,
+      "norm_label": "positions()",
+      "id": "src_app_positions"
+    },
+    {
+      "label": "PnlMiniChart()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L167",
+      "_origin": "ast",
+      "community": 5,
+      "norm_label": "pnlminichart()",
+      "id": "src_app_pnlminichart"
+    },
+    {
+      "label": "TradeButtons()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L191",
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "tradebuttons()",
+      "id": "src_app_tradebuttons"
+    },
+    {
+      "label": "FuturesView()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L193",
+      "_origin": "ast",
+      "community": 1,
+      "norm_label": "futuresview()",
+      "id": "src_app_futuresview"
+    },
+    {
+      "label": "ForexView()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L224",
+      "_origin": "ast",
+      "community": 1,
+      "norm_label": "forexview()",
+      "id": "src_app_forexview"
+    },
+    {
+      "label": "RecoView()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L333",
+      "_origin": "ast",
+      "community": 1,
+      "norm_label": "recoview()",
+      "id": "src_app_recoview"
+    },
+    {
+      "label": "HistRow()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L467",
+      "_origin": "ast",
+      "community": 5,
+      "norm_label": "histrow()",
+      "id": "src_app_histrow"
+    },
+    {
+      "label": "HistoryView()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L493",
+      "_origin": "ast",
+      "community": 1,
+      "norm_label": "historyview()",
+      "id": "src_app_historyview"
+    },
+    {
+      "label": "AdminView()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L519",
+      "_origin": "ast",
+      "community": 3,
+      "norm_label": "adminview()",
+      "id": "src_app_adminview"
+    },
+    {
+      "label": "AskView()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L557",
+      "_origin": "ast",
+      "community": 3,
+      "norm_label": "askview()",
+      "id": "src_app_askview"
+    },
+    {
+      "label": "ForexBetaDashboard()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L586",
+      "_origin": "ast",
+      "community": 4,
+      "norm_label": "forexbetadashboard()",
+      "id": "src_app_forexbetadashboard"
+    },
+    {
+      "label": "SettingsView()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L655",
+      "_origin": "ast",
+      "community": 4,
+      "norm_label": "settingsview()",
+      "id": "src_app_settingsview"
+    },
+    {
+      "label": "NAV",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L804",
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "nav",
+      "id": "src_app_nav"
+    },
+    {
+      "label": "ChangePassword()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L819",
+      "_origin": "ast",
+      "community": 3,
+      "norm_label": "changepassword()",
+      "id": "src_app_changepassword"
+    },
+    {
+      "label": "Sidebar()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L836",
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "sidebar()",
+      "id": "src_app_sidebar"
+    },
+    {
+      "label": "AuthGate()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L865",
+      "_origin": "ast",
+      "community": 4,
+      "norm_label": "authgate()",
+      "id": "src_app_authgate"
+    },
+    {
+      "label": "App()",
+      "file_type": "code",
+      "source_file": "src/App.jsx",
+      "source_location": "L955",
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "app()",
+      "id": "src_app_app"
+    },
+    {
+      "label": "AutoTrader.jsx",
+      "file_type": "code",
+      "source_file": "src/components/AutoTrader.jsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 2,
+      "norm_label": "autotrader.jsx",
+      "id": "components_autotrader"
+    },
+    {
+      "label": "fmt()",
+      "file_type": "code",
+      "source_file": "src/components/AutoTrader.jsx",
+      "source_location": "L4",
+      "_origin": "ast",
+      "community": 2,
+      "norm_label": "fmt()",
+      "id": "components_autotrader_fmt"
+    },
+    {
+      "label": "pct()",
+      "file_type": "code",
+      "source_file": "src/components/AutoTrader.jsx",
+      "source_location": "L5",
+      "_origin": "ast",
+      "community": 2,
+      "norm_label": "pct()",
+      "id": "components_autotrader_pct"
+    },
+    {
+      "label": "TIER_COLORS",
+      "file_type": "code",
+      "source_file": "src/components/AutoTrader.jsx",
+      "source_location": "L7",
+      "_origin": "ast",
+      "community": 2,
+      "norm_label": "tier_colors",
+      "id": "components_autotrader_tier_colors"
+    },
+    {
+      "label": "TIER_LABELS",
+      "file_type": "code",
+      "source_file": "src/components/AutoTrader.jsx",
+      "source_location": "L8",
+      "_origin": "ast",
+      "community": 2,
+      "norm_label": "tier_labels",
+      "id": "components_autotrader_tier_labels"
+    },
+    {
+      "label": "AutoTrader()",
+      "file_type": "code",
+      "source_file": "src/components/AutoTrader.jsx",
+      "source_location": "L10",
+      "_origin": "ast",
+      "community": 2,
+      "norm_label": "autotrader()",
+      "id": "components_autotrader_autotrader"
     },
     {
       "label": "api.js",
@@ -516,6 +536,142 @@
   ],
   "links": [
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_dailybrief",
+      "target": "components_dailybrief_dailybrief"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_dailybrief",
+      "target": "components_dailybrief_fmt"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_dailybrief",
+      "target": "components_dailybrief_pct"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_dailybrief",
+      "target": "components_dailybrief_state_colors"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_dailybrief",
+      "target": "components_dailybrief_tier_colors"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "components_dailybrief",
+      "target": "components_dailybrief_wall_tier_colors",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "components_dailybrief",
+      "target": "components_dailybrief_wall_tier_labels",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_dailybrief",
+      "target": "src_api_apiget"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_dailybrief",
+      "target": "src_api_apipost"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app",
+      "target": "components_dailybrief"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L94",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_dailybrief_dailybrief",
+      "target": "components_dailybrief_fmt"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/DailyBrief.jsx",
+      "source_location": "L137",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_dailybrief_dailybrief",
+      "target": "components_dailybrief_pct"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.jsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app",
+      "target": "components_dailybrief_dailybrief"
+    },
+    {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -536,28 +692,6 @@
       "confidence_score": 1.0,
       "source": "src_app",
       "target": "components_autotrader_autotrader"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/App.jsx",
-      "source_location": "L10",
-      "weight": 1.0,
-      "source": "src_app",
-      "target": "components_dailybrief",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/App.jsx",
-      "source_location": "L10",
-      "weight": 1.0,
-      "source": "src_app",
-      "target": "components_dailybrief_dailybrief",
-      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -1453,100 +1587,6 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/components/DailyBrief.jsx",
-      "source_location": "L13",
-      "weight": 1.0,
-      "source": "components_dailybrief",
-      "target": "components_dailybrief_dailybrief",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/components/DailyBrief.jsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "source": "components_dailybrief",
-      "target": "components_dailybrief_fmt",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/components/DailyBrief.jsx",
-      "source_location": "L5",
-      "weight": 1.0,
-      "source": "components_dailybrief",
-      "target": "components_dailybrief_pct",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/components/DailyBrief.jsx",
-      "source_location": "L11",
-      "weight": 1.0,
-      "source": "components_dailybrief",
-      "target": "components_dailybrief_state_colors",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/components/DailyBrief.jsx",
-      "source_location": "L7",
-      "weight": 1.0,
-      "source": "components_dailybrief",
-      "target": "components_dailybrief_tier_colors",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/components/DailyBrief.jsx",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "components_dailybrief",
-      "target": "src_api_apiget",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/components/DailyBrief.jsx",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "components_dailybrief",
-      "target": "src_api_apipost",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/components/DailyBrief.jsx",
-      "source_location": "L94",
-      "weight": 1.0,
-      "source": "components_dailybrief_dailybrief",
-      "target": "components_dailybrief_fmt",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/components/DailyBrief.jsx",
-      "source_location": "L137",
-      "weight": 1.0,
-      "source": "components_dailybrief_dailybrief",
-      "target": "components_dailybrief_pct",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
       "source_file": "src/api.js",
       "source_location": "L38",
       "weight": 1.0,
@@ -1702,5 +1742,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "2cd9d38985bc0a6e4687dbb345d128aef471ff6b"
+  "built_at_commit": "c4edca1ce7a938f5fa8925467226d98aefcfbf8b"
 }
