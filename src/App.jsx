@@ -24,7 +24,7 @@ function useWallet(poll = true) {
   useEffect(() => {
     refresh()
     if (!poll) return
-    const t = setInterval(refresh, 15000)
+    const t = setInterval(refresh, 60000)
     return () => clearInterval(t)
   }, [refresh, poll])
   return { data, refresh }
@@ -42,7 +42,7 @@ function useCandles(symbol) {
       } catch { /* keep last */ }
     }
     load()
-    const t = setInterval(load, 30000)
+    const t = setInterval(load, 120000)
     return () => { live = false; clearInterval(t) }
   }, [symbol])
   return candles

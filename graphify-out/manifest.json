@@ -5,8 +5,8 @@
     "semantic_hash": ""
   },
   "src/App.jsx": {
-    "mtime": 1782185095.412422,
-    "ast_hash": "0196876ed88b966c619116cd6cf29bfc",
+    "mtime": 1782364437.4312053,
+    "ast_hash": "e8a7f5588c151459cadacac5dbc4c9a1",
     "semantic_hash": ""
   },
   "src/CandleChart.jsx": {
@@ -50,23 +50,23 @@
     "semantic_hash": ""
   },
   "src/components/EquityHub.jsx": {
-    "mtime": 1782153692.219716,
-    "ast_hash": "1a1151f54a25013afc4b63a89c3ac4dd",
+    "mtime": 1782294201.5605848,
+    "ast_hash": "0ec401556e86c291aa5b7e57082480d4",
     "semantic_hash": ""
   },
   "src/components/OptionsHub.jsx": {
-    "mtime": 1782153638.0372672,
-    "ast_hash": "3c796cbecbd38ea374cfe3538ebe3b58",
+    "mtime": 1782294165.4576678,
+    "ast_hash": "425d6be7ee09f14d871d94c4f34d2859",
     "semantic_hash": ""
   },
   "src/components/Portfolio.jsx": {
-    "mtime": 1782153783.6765409,
-    "ast_hash": "e8e0fd07cad5f7adee928a221cdaccff",
+    "mtime": 1782356748.2623308,
+    "ast_hash": "c9b1b8e9542d58a70d6839d242324f47",
     "semantic_hash": ""
   },
   "src/components/RegimeStrip.jsx": {
-    "mtime": 1782152637.6445947,
-    "ast_hash": "d89f869f272e2d31987dd40fc8ef5b6d",
+    "mtime": 1782186776.6890874,
+    "ast_hash": "4cd92745b4aeaa5636790282709b53d8",
     "semantic_hash": ""
   },
   "src/components/SwingHub.jsx": {
@@ -77,6 +77,31 @@
   "src/components/TradeExplainer.jsx": {
     "mtime": 1782152206.2296317,
     "ast_hash": "adc303d747a5b1290c9708c93e430448",
+    "semantic_hash": ""
+  },
+  "src/components/Alerts.jsx": {
+    "mtime": 1782280392.01307,
+    "ast_hash": "a84bf3559905d4b926d08930f452fd11",
+    "semantic_hash": ""
+  },
+  "src/components/AutoTrader.jsx": {
+    "mtime": 1782364407.666758,
+    "ast_hash": "0b73ae3c7027047d5a491e9b2a29ca7e",
+    "semantic_hash": ""
+  },
+  "src/components/DailyBrief.jsx": {
+    "mtime": 1782356697.9270058,
+    "ast_hash": "4aac2e782077e403025420c87aa31916",
+    "semantic_hash": ""
+  },
+  "src/components/Performance.jsx": {
+    "mtime": 1782280367.1878004,
+    "ast_hash": "127127513ca8dffa292c836f58fddd40",
+    "semantic_hash": ""
+  },
+  "src/components/RiskDashboard.jsx": {
+    "mtime": 1782280318.0824318,
+    "ast_hash": "fa7e7c600b61d6b80a399d6f536669d5",
     "semantic_hash": ""
   }
 }

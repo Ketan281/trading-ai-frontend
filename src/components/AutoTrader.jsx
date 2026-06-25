@@ -28,7 +28,7 @@ export default function AutoTrader() {
     finally { setLoading(false) }
   }, [])
 
-  useEffect(() => { load(); const t = setInterval(load, 30000); return () => clearInterval(t) }, [load])
+  useEffect(() => { load(); const t = setInterval(load, 120000); return () => clearInterval(t) }, [load])
 
   async function refreshSignals() {
     setSigLoading(true)
