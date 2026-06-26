@@ -65,8 +65,13 @@ export default function DailyBrief() {
     finally { setToggling(false) }
   }
 
-  // The single highest-probability trade right now — the best-scored OI wall.
+  // The single highest expected-value trade right now. Prefer the backend's
+  // canonical EV-ranked pick (`best`); fall back to a local win% scan.
   function bestTradeNow() {
+    if (wallSignals?.best) {
+      const b = wallSignals.best
+      return { ...b, underlying: b.underlying || 'NIFTY' }
+    }
     if (!wallSignals?.signals) return null
     let best = null
     for (const sym of ['NIFTY', 'BANKNIFTY']) {
@@ -188,6 +193,7 @@ export default function DailyBrief() {
               <span>Target <b>{fmt(best.target)}</b></span>
               <span>SL <b>{fmt(best.stoploss)}</b></span>
               <span>Funds <b>{fmt(best.funds_required)}</b></span>
+              {best.ev != null && <span className={best.ev >= 0 ? 'ok' : 'err'}>EV <b>{fmt(best.ev)}</b></span>}
               <span className="mut">Score {best.score}</span>
               <span className="mut">{best.lots} lot{best.lots > 1 ? 's' : ''}</span>
             </div>
