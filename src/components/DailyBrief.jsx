@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { apiGet, apiPost } from '../api'
+import TradingViewChart from './TradingViewChart.jsx'
 
 const fmt = (n) => n == null ? '-' : '₹' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 })
 const pct = (n) => n == null ? '-' : n.toFixed(1) + '%'
@@ -22,16 +23,20 @@ export default function DailyBrief() {
   const [executing, setExecuting] = useState(false)
   const [autoDash, setAutoDash] = useState(null)
   const [wallSignals, setWallSignals] = useState(null)
+  const [indianMode, setIndianMode] = useState('custom')
+  const [toggling, setToggling] = useState(false)
+  const [autoOpened, setAutoOpened] = useState(null)
 
   const load = useCallback(async () => {
     try {
-      const [b, r, al, rg, ad, ws] = await Promise.all([
+      const [b, r, al, rg, ad, ws, w] = await Promise.all([
         apiGet('/portfolio/brief'),
         apiGet('/portfolio/risk').catch(() => null),
         apiGet('/portfolio/alerts?unread_only=true').catch(() => ({ alerts: [] })),
         apiGet('/phase2/regime').catch(() => null),
         apiGet('/phase2/auto/dashboard').catch(() => null),
         apiGet('/phase2/auto/wall-signals').catch(() => null),
+        apiGet('/me/wallet').catch(() => null),
       ])
       setBrief(b)
       setRisk(r)
@@ -39,6 +44,7 @@ export default function DailyBrief() {
       setRegime(rg)
       if (ad && !ad.error) setAutoDash(ad)
       if (ws && !ws.error) setWallSignals(ws)
+      if (w?.indian_trade_mode) setIndianMode(w.indian_trade_mode)
     } catch {}
     finally { setLoading(false) }
   }, [])
@@ -48,6 +54,31 @@ export default function DailyBrief() {
     const t = setInterval(load, 120000)
     return () => clearInterval(t)
   }, [load])
+
+  async function toggleMode(mode) {
+    setToggling(true); setAutoOpened(null)
+    try {
+      const r = await apiPost('/me/mode/indian', { mode })
+      if (r.auto_opened) setAutoOpened(r.auto_opened)
+      setIndianMode(mode); load()
+    } catch (e) { setAutoOpened([{ error: e.message }]) }
+    finally { setToggling(false) }
+  }
+
+  // The single highest-probability trade right now — the best-scored OI wall.
+  function bestTradeNow() {
+    if (!wallSignals?.signals) return null
+    let best = null
+    for (const sym of ['NIFTY', 'BANKNIFTY']) {
+      const d = wallSignals.signals[sym]
+      if (!d || d.status !== 'ok') continue
+      for (const s of (d.signals || [])) {
+        if (!s.tradeable || (s.signal || '').includes('STRANGLE')) continue
+        if (!best || (s.win_pct || 0) > (best.win_pct || 0)) best = { ...s, underlying: sym }
+      }
+    }
+    return best
+  }
 
   async function dryRun() {
     setExecuting(true)
@@ -68,6 +99,8 @@ export default function DailyBrief() {
   if (!brief) return <div className="panel"><div className="mut">Could not load daily brief.</div></div>
 
   const ms = brief.market_status || {}
+  const best = bestTradeNow()
+  const isAuto = indianMode === 'ml'
   const idxSignals = (brief.signals?.index_options || []).filter(s => !s.error)
   const plan = brief.plan || []
   const eq = risk?.equity || {}
@@ -107,6 +140,68 @@ export default function DailyBrief() {
           <span className="brief-status-val" style={{ color: STATE_COLORS[riskState] || '#9ca3af' }}>
             {riskState.toUpperCase()}
           </span>
+        </div>
+      </div>
+
+      {/* Autonomous mode + best trade hero */}
+      <div className="panel" style={{ borderLeft: '3px solid ' + (isAuto ? '#22c55e' : '#3b82f6') }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+          <div>
+            <h3 style={{ margin: 0 }}>{isAuto ? 'Autonomous ML Trading — ON' : 'Today’s Best Trade'}</h3>
+            <div className="mut" style={{ fontSize: 12 }}>
+              {isAuto
+                ? 'The system picks, sizes and exits OI wall-selling trades by itself (one per index) on your ₹10L paper account.'
+                : 'Highest-probability setup right now from the trained OI wall-selling model.'}
+            </div>
+          </div>
+          <div className="mode-switch">
+            <button className={'mode-btn' + (!isAuto ? ' active' : '')}
+              disabled={toggling} onClick={() => toggleMode('custom')}>
+              Manual <span className="mode-desc">You decide</span>
+            </button>
+            <button className={'mode-btn ml' + (isAuto ? ' active' : '')}
+              disabled={toggling} onClick={() => toggleMode('ml')}>
+              ML Auto <span className="mode-desc">System trades</span>
+            </button>
+          </div>
+        </div>
+
+        {autoOpened && autoOpened.length > 0 && (
+          <div style={{ marginTop: 8 }}>
+            {autoOpened.map((a, i) => (
+              <div key={i} className={'auto-msg ' + (a.error ? 'err' : a.trade ? 'ok' : '')}>
+                {a.trade ? `Opened ${a.symbol} (${a.trade.side})`
+                  : a.error ? `Error: ${a.error}` : a.info || 'No trade available'}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {best && (
+          <div className="c" style={{ marginTop: 12, borderLeft: '3px solid #22c55e' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: 16 }}>{best.signal}</span>
+              <span className="ok" style={{ fontWeight: 700, fontSize: 18 }}>{best.win_pct}% win</span>
+            </div>
+            <div style={{ fontSize: 12, display: 'flex', gap: 12, marginTop: 6, flexWrap: 'wrap' }}>
+              <span>Sell <b>{fmt(best.premium)}</b></span>
+              <span>Target <b>{fmt(best.target)}</b></span>
+              <span>SL <b>{fmt(best.stoploss)}</b></span>
+              <span>Funds <b>{fmt(best.funds_required)}</b></span>
+              <span className="mut">Score {best.score}</span>
+              <span className="mut">{best.lots} lot{best.lots > 1 ? 's' : ''}</span>
+            </div>
+            {!isAuto && (
+              <div className="mut" style={{ fontSize: 11, marginTop: 6 }}>
+                Switch to <b>ML Auto</b> to have the system take and manage this automatically, or trade it from the Options tab.
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Live chart for the best trade's index (TradingView) */}
+        <div style={{ marginTop: 12 }}>
+          <TradingViewChart symbol={best?.underlying || 'NIFTY'} interval="5" height={360} />
         </div>
       </div>
 

@@ -7,6 +7,8 @@ const TIER_COLORS = {
   TIER_1A: '#22c55e', TIER_1B: '#86efac', TIER_2A: '#3b82f6',
   TIER_2B: '#60a5fa', TIER_2C: '#f59e0b', NO_TRADE: '#6b7280',
 }
+const WALL_TIER_COLORS = { 1: '#22c55e', 2: '#f59e0b', 3: '#6b7280' }
+const WALL_TIER_LABELS = { 1: 'FULL LOT', 2: 'HALF LOT', 3: 'QUARTER' }
 
 export default function OptionsHub({ onExplain }) {
   const [picks, setPicks] = useState([])
@@ -14,6 +16,7 @@ export default function OptionsHub({ onExplain }) {
   const [best, setBest] = useState(null)
   const [strikes, setStrikes] = useState({})
   const [mlOptions, setMlOptions] = useState([])
+  const [wallSignals, setWallSignals] = useState(null)
   const [loading, setLoading] = useState(true)
   const [msg, setMsg] = useState('')
   const [positions, setPositions] = useState([])
@@ -22,16 +25,18 @@ export default function OptionsHub({ onExplain }) {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const [reco, wallet, p2, niftyStrikes, bnStrikes, mlOpt] = await Promise.all([
+      const [reco, wallet, p2, niftyStrikes, bnStrikes, mlOpt, walls] = await Promise.all([
         apiGet('/recommendations'),
         apiGet('/me/wallet'),
         apiGet('/phase2/recommendations').catch(() => null),
         apiGet('/ml/intraday/strikes/NIFTY').catch(() => null),
         apiGet('/ml/intraday/strikes/BANKNIFTY').catch(() => null),
         apiGet('/ml/intraday/options').catch(() => null),
+        apiGet('/phase2/auto/wall-signals').catch(() => null),
       ])
       setPicks(reco?.options || [])
       setBest(reco?.best_per_segment?.options || null)
+      if (walls && !walls.error) setWallSignals(walls)
       setPositions((wallet?.open_trades || []).filter(t => t.segment === 'options'))
 
       const stk = {}
@@ -106,6 +111,62 @@ export default function OptionsHub({ onExplain }) {
 
       {/* Best Picks tab */}
       {activeTab === 'signals' && <>
+        {/* OI Wall Selling — the trained, backtested strategy (71-89% win) */}
+        {wallSignals && (
+          <div style={{ marginBottom: 16 }}>
+            <h3 style={{ fontSize: 14, marginBottom: 8 }}>
+              OI Wall Selling
+              <span className="mut" style={{ fontWeight: 400, fontSize: 11, marginLeft: 8 }}>
+                ML-trained · 71-89% win · the strategy the models are built on
+              </span>
+            </h3>
+            {['NIFTY', 'BANKNIFTY'].map(symn => {
+              const data = wallSignals.signals?.[symn]
+              if (!data) return null
+              if (data.status !== 'ok') return (
+                <div key={symn} style={{ marginBottom: 8 }}>
+                  <span style={{ fontWeight: 700 }}>{symn}</span>{' '}
+                  <span className="mut">{data.status}: {data.reason || 'No signals'}</span>
+                </div>
+              )
+              const sigs = (data.signals || []).filter(s => !s.signal?.includes('STRANGLE') && s.tradeable)
+              return (
+                <div key={symn} style={{ marginBottom: 12 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6 }}>
+                    {symn} <span className="mut" style={{ fontWeight: 400 }}>Spot: {fmt(data.spot)}</span>
+                  </div>
+                  {sigs.length === 0 && (
+                    <div className="mut" style={{ fontSize: 12 }}>No tradeable walls (too weak or too close to spot)</div>
+                  )}
+                  {sigs.map((s, i) => (
+                    <div key={i} className="c" style={{ marginBottom: 8, borderLeft: `3px solid ${WALL_TIER_COLORS[s.tier] || '#333'}` }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontWeight: 700 }}>{s.signal}</span>
+                        <span style={{ color: WALL_TIER_COLORS[s.tier], fontWeight: 600, fontSize: 12 }}>
+                          {WALL_TIER_LABELS[s.tier] || 'SKIP'} · {s.win_pct}% win
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 12, display: 'flex', gap: 12, marginTop: 6, flexWrap: 'wrap' }}>
+                        <span>Sell <b>{fmt(s.premium)}</b></span>
+                        <span>Target <b>{fmt(s.target)}</b></span>
+                        <span>SL <b>{fmt(s.stoploss)}</b></span>
+                        <span>Funds <b>{fmt(s.funds_required)}</b></span>
+                        <span className="mut">Score {s.score}</span>
+                        <span className="mut">Dist {s.dist_pct?.toFixed(1)}%</span>
+                        <span className="mut">{s.lots} lot{s.lots > 1 ? 's' : ''}</span>
+                      </div>
+                      {s.oi_building && <div style={{ fontSize: 11, color: '#22c55e', marginTop: 4 }}>OI Building ↑</div>}
+                    </div>
+                  ))}
+                </div>
+              )
+            })}
+            <div className="mut" style={{ fontSize: 11 }}>
+              Wall selling is executed by the ML auto-trader (Auto tab / ML Auto mode), which sizes by tier and manages exits.
+            </div>
+          </div>
+        )}
+
         {best && (
           <div className="c" style={{ marginBottom: 16, borderLeft: '3px solid #3b82f6' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -157,7 +218,7 @@ export default function OptionsHub({ onExplain }) {
           </div>
         )}
 
-        {!loading && !best && mlOptions.length === 0 && (
+        {!loading && !best && mlOptions.length === 0 && !wallSignals && (
           <div className="c" style={{ textAlign: 'center', padding: 24 }}>
             <div style={{ fontSize: 16 }}>No option picks right now</div>
             <div style={{ fontSize: 12, opacity: 0.5, marginTop: 4 }}>

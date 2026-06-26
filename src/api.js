@@ -33,6 +33,54 @@ async function req(path, { method = 'GET', body, auth = true } = {}) {
   return d
 }
 
-export const apiGet = (path, opts) => req(path, { ...opts })
-export const apiPost = (path, body, opts) => req(path, { method: 'POST', body, ...opts })
-export const apiDelete = (path, opts) => req(path, { method: 'DELETE', ...opts })
+// ── GET cache + in-flight de-duplication ───────────────────────────────────
+// The backend is a single worker on a 1GB box. The UI mounts ~6 components that
+// each poll the same endpoints, and switching tabs remounts them — without this
+// layer that's a burst of duplicate requests every interaction, which is what
+// makes the app feel like it "reloads everything" and contributes to 504s.
+//
+//   • In-flight de-dup: N concurrent GETs to the same path share ONE request.
+//   • TTL cache: a repeat GET within `ttl` ms returns the last value instantly
+//     (no network), so revisiting a tab is free.
+//   • Any successful POST/DELETE clears the cache so the next GET is fresh —
+//     placing/closing a trade, depositing, changing mode all reflect at once.
+const _cache = new Map()      // path -> { ts, data }
+const _inflight = new Map()   // path -> Promise
+const DEFAULT_TTL = 30000     // 30s — matches the slow server-side caches
+
+export function clearApiCache(prefix) {
+  if (!prefix) { _cache.clear(); return }
+  for (const k of _cache.keys()) if (k.startsWith(prefix)) _cache.delete(k)
+}
+
+async function cachedGet(path, { ttl = DEFAULT_TTL, force = false, auth = true } = {}) {
+  const now = Date.now()
+  if (!force && ttl > 0) {
+    const hit = _cache.get(path)
+    if (hit && now - hit.ts < ttl) return hit.data
+  }
+  // Coalesce concurrent callers onto a single network request.
+  if (_inflight.has(path)) return _inflight.get(path)
+
+  const p = req(path, { auth })
+    .then((data) => {
+      if (ttl > 0) _cache.set(path, { ts: Date.now(), data })
+      return data
+    })
+    .finally(() => { _inflight.delete(path) })
+
+  _inflight.set(path, p)
+  return p
+}
+
+// apiGet(path)                       → cached (30s) + de-duped
+// apiGet(path, { force: true })      → bypass cache (e.g. manual refresh)
+// apiGet(path, { ttl: 0 })           → never cache this call
+// apiGet(path, { ttl: 120000 })      → custom freshness window
+export const apiGet = (path, opts) => cachedGet(path, opts)
+
+export const apiPost = (path, body, opts) =>
+  req(path, { method: 'POST', body, ...opts }).then((d) => { clearApiCache(); return d })
+
+export const apiDelete = (path, opts) =>
+  req(path, { method: 'DELETE', ...opts }).then((d) => { clearApiCache(); return d })

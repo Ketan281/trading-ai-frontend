@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { apiGet, apiPost, apiDelete, getToken, setToken, setAuthFailHandler, API } from './api'
 import CandleChart from './CandleChart.jsx'
+import TradingViewChart from './components/TradingViewChart.jsx'
 import RegimeStrip from './components/RegimeStrip.jsx'
 import TradeExplainer from './components/TradeExplainer.jsx'
 import OptionsHub from './components/OptionsHub.jsx'
@@ -193,7 +194,6 @@ function TradeButtons({ msg }) { return msg ? <div className="crumb" style={{ ma
 function FuturesView() {
   const { data, refresh } = useWallet()
   const [sym, setSym] = useState('NIFTY')
-  const candles = useCandles(sym)
   const [levels, setLevels] = useState(null)
   const [msg, setMsg] = useState('')
   async function take(side) {
@@ -216,7 +216,10 @@ function FuturesView() {
       <button className="trade-btn sell" onClick={() => take('short')}>Go Short</button>
     </div>
     <TradeButtons msg={msg} />
-    <CandleChart candles={candles} levels={levels} title={`${sym} · 5m`} />
+    <TradingViewChart symbol={sym} interval="5" height={380} />
+    {levels && <div className="mut" style={{ marginTop: 6, fontSize: 12 }}>
+      Last trade levels — Entry {fmt(levels.entry)} · SL {fmt(levels.stop)} · TGT {fmt(levels.target)}
+    </div>}
     <div className="panel"><h3>Open positions</h3><Positions trades={indianTrades} refresh={refresh} /></div>
   </>
 }

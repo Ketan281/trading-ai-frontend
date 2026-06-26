@@ -90,17 +90,19 @@ export default function Portfolio() {
   const [curve, setCurve] = useState(null)
   const [days, setDays] = useState(30)
   const [models, setModels] = useState(null)
+  const [autoDash, setAutoDash] = useState(null)
   const live = useLiveStream()
 
   const load = useCallback(async () => {
     try {
-      const [w, alloc, p, pf, cv, m] = await Promise.all([
+      const [w, alloc, p, pf, cv, m, ad] = await Promise.all([
         apiGet('/me/wallet'),
         apiGet('/recommendations/allocate').catch(() => null),
         apiGet('/phase2/psychology').catch(() => null),
         apiGet(`/portfolio/performance?days=${days}`).catch(() => null),
         apiGet(`/portfolio/equity-curve?days=${days * 3}`).catch(() => null),
         apiGet('/portfolio/models').catch(() => null),
+        apiGet('/phase2/auto/dashboard').catch(() => null),
       ])
       setWallet(w)
       setPositions((w?.open_trades || []).filter(t => t.segment !== 'forex'))
@@ -110,10 +112,11 @@ export default function Portfolio() {
       setPerf(pf)
       setCurve(cv?.curve || [])
       if (m) setModels(m)
+      if (ad && !ad.error) setAutoDash(ad)
     } catch {}
   }, [days])
 
-  useEffect(() => { load(); const t = setInterval(load, 15000); return () => clearInterval(t) }, [load])
+  useEffect(() => { load(); const t = setInterval(load, 60000); return () => clearInterval(t) }, [load])
 
   async function toggleMode(mode) {
     setToggling(true); setAutoOpened(null)
@@ -356,6 +359,34 @@ export default function Portfolio() {
           ))}
         </>)}
       </div>
+
+      {/* ML Auto-Trader positions — the autonomous system's own book (separate
+          from your manual wallet above). Shown here so it matches the Home tab. */}
+      {autoDash?.open_trades?.length > 0 && (
+        <div className="c" style={{ marginTop: 16 }}>
+          <div className="k">ML Auto-Trader Positions ({autoDash.open_trades.length})</div>
+          <div className="mut" style={{ fontSize: 11, marginTop: 2 }}>
+            Managed automatically by the ML engine — sized by tier, exited on SL/target.
+          </div>
+          <table className="hist" style={{ marginTop: 8 }}>
+            <thead>
+              <tr><th>Symbol</th><th>Segment</th><th>Action</th><th>Entry</th><th>Qty</th><th>Score</th></tr>
+            </thead>
+            <tbody>
+              {autoDash.open_trades.map((t, i) => (
+                <tr key={i}>
+                  <td>{t.symbol}</td>
+                  <td><span className={'seg-label ' + t.segment}>{t.segment}</span></td>
+                  <td>{t.action}</td>
+                  <td>{fmt(t.entry)}</td>
+                  <td>{t.qty}</td>
+                  <td>{t.score}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* ML Models */}
       {models && (
